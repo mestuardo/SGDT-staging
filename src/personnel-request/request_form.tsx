@@ -175,24 +175,6 @@ export default function SignIn(): JSX.Element {
 
       onSubmitHandler({
         variables: {
-          // createRequestInput: {
-          //   internalRep: '609b4b9c4cfb419054fe7955',
-          //   client: '6098625936b836005385ac40',
-          //   maxSalary: 1000000,
-          //   contractType: 'INDEFINIDO',
-          //   vacancies: 2,
-          //   position: 'Desarrollador',
-          //   stage: 'REQUEST',
-          //   shiftType: 'JORNADA_COMPLETA',
-          //   softSkills: [
-          //     'Trabajo en equipo', 'Buena comunicación',
-          //   ],
-          //   yearsExperience: 1,
-          //   languages: [{ language: 'Inglés' }],
-          //   possibleDuration: 3.5,
-          //   requestDescription: 'Se necesita desarrollador Java, Python y Node',
-          //   requiresComputer: true,
-          // },
           createRequestInput: {
             approxStartDate: formSchema.approxStartDate,
             client: formSchema.client, // cambiar después por id real de cliente
@@ -211,8 +193,6 @@ export default function SignIn(): JSX.Element {
             possibleDuration: parseFloat(formSchema.possibleDuration),
             recruiter: '609b4b9c4cfb419054fe7955', // cambiar después por id real de reclutador
             requestDescription: formSchema.requestDescription,
-            // requiresComputer: formSchema.requiresComputer === 'Sí',
-            // requiresTechnical: formSchema.requiresTechnical === 'Sí',
             requiresComputer: summaryLabels[formSchema.requiresComputer],
             requiresTechnical: summaryLabels[formSchema.requiresTechnical],
             serviceType: summaryLabels[formSchema.serviceType],
@@ -220,7 +200,6 @@ export default function SignIn(): JSX.Element {
             shiftType: summaryLabels[formSchema.shiftType],
             softSkills: formSchema.softSkills.split(','), // forma tentativa
             specialRequirements: formSchema.specialRequirements.split(','), // forma tentativa
-            stage: 'REQUEST',
             technicalRequirements: formSchema.technicalRequirements.split(','), // formatentativa
             vacancies: +formSchema.vacancies,
             // workAdress: '', // debe entregarse del form en formato ciudad,comuna,calle,número
