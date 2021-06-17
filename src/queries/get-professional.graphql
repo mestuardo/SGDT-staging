@@ -1,0 +1,12 @@
+query Query($getProfessionalProfessionalId: ID!) {
+  professional: getProfessional(professionalId: $getProfessionalProfessionalId) {
+    id
+    name
+    firstSurname
+    secondSurname
+    rut
+    specialty
+    currentJob
+    savedJobOffers
+  }
+}

@@ -1,0 +1,5 @@
+mutation ChangeApplicationStatusMutation($changeApplicationStatusApplicationId: ID!, $changeApplicationStatusStatus: ApplicationStatusOptions!) {
+  changeApplicationStatus(applicationId: $changeApplicationStatusApplicationId, status: $changeApplicationStatusStatus) {
+    id
+  }
+}

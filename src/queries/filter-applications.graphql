@@ -1,0 +1,13 @@
+query Query($filterApplicationsJobOfferId: ID!) {
+  jobOfferApplications: filterApplications(jobOfferId: $filterApplicationsJobOfferId) {
+    id
+    jobOfferId
+    professionalId
+    status
+    recruiterId
+    questions
+    answers
+    assessment
+    stage
+  }
+}

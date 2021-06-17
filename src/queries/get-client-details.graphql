@@ -1,0 +1,7 @@
+query Query {
+  clients {
+    tradeName
+    id
+    name
+  }
+}

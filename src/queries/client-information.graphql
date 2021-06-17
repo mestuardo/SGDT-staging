@@ -1,0 +1,11 @@
+query Query($getClientId: ID!) {
+  getClient(_id: $getClientId) {
+    name
+    tradeName
+    rut
+    contactInfo {
+      phone
+      email
+    }
+  }
+}

@@ -1,0 +1,12 @@
+mutation CreateRequestMutation($createRequestInput: RequestInput) {
+  createRequest(input: $createRequestInput) {
+    internalRep
+    client
+    maxSalary 
+    shiftType
+    contractType   
+    vacancies
+    position
+    stage
+  }
+}

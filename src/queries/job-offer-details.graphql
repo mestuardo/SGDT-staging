@@ -1,0 +1,27 @@
+query Query($getJobOfferId: ID!) {
+  jobOffer: getJobOffer(_id: $getJobOfferId) {
+    id
+    client
+    contractType
+    position
+    vacancies
+    formationStatus
+    approxStartDate
+    possibleDuration
+    offerDescription
+    levelOfStudies
+    languages {
+      language
+    }
+    maxSalary
+    softSkills
+    yearsExperience
+    shiftType
+    requiresComputer
+    questions
+    serviceType
+    specialRequirements
+    technicalRequirements
+
+  }
+}

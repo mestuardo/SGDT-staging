@@ -1,0 +1,8 @@
+query Query {
+  externalRepresentatives {
+    name
+    id
+    firstSurname
+    secondSurname
+  }
+}

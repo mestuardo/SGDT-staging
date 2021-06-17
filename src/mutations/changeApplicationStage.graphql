@@ -1,0 +1,5 @@
+mutation ChangeApplicationStageMutation($changeApplicationStageApplicationId: ID!, $changeApplicationStageStage: ApplicationStageOptions!) {
+  changeApplicationStage(applicationId: $changeApplicationStageApplicationId, stage: $changeApplicationStageStage) {
+    id
+  }
+}

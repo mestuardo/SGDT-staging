@@ -1,0 +1,24 @@
+query Query($getRequestId: ID!) {
+  request: getRequest(_id: $getRequestId) {
+    id
+    client
+    contractType
+    position
+    vacancies
+    formationStatus
+    approxStartDate
+    possibleDuration
+    requestDescription
+    levelOfStudies
+    languages {
+      language
+      level
+    }
+    maxSalary
+    softSkills
+    yearsExperience
+    shiftType
+    requiresComputer
+
+  }
+}
