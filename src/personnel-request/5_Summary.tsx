@@ -6,10 +6,7 @@ import {
 } from '@material-ui/core';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { useQuery } from '@apollo/client';
-import CLIENT_INFO from '../queries/client-information.graphql';
 import { CreateRequestTypeString } from '../types/create-request-string-types';
-import { ClientInformationType } from '../types/job-offer-query-types';
 
 const useRowStyles = makeStyles({
   root: {
@@ -70,7 +67,7 @@ interface AdditionalInfoProps {
   formSchema: CreateRequestTypeString,
 }
 
-function createData(name: string, value: string | Date |
+function createData(name: string, value: string | Date | number |
 { id: string; label: string; language: string; level: string; }[]) {
   return {
     name, value,
@@ -81,10 +78,6 @@ export default function AdditionalInfo(props: AdditionalInfoProps): JSX.Element 
   const {
     formSchema,
   } = props;
-  const {
-    data: ClientDetails, loading: ClientDetailsLoading, error: CLientDetailsError,
-  } = useQuery<ClientInformationType>(CLIENT_INFO,
-    { variables: { getClientId: formSchema.client } });
   // Here we populate the table rows
 
   const summaryLabels: { [key:string]:string } = {
@@ -129,7 +122,7 @@ export default function AdditionalInfo(props: AdditionalInfoProps): JSX.Element 
 
   const rows2 = rows.filter((row) => row.name !== 'ID' && row.name !== 'Cliente-ID' && row.name !== 'Etapa' && row.name !== 'Representante Interno' && row.name !== 'Representante Externo-ID');
 
-  function getRowValueLabel(row_name: string, row_value: Date | string |
+  function getRowValueLabel(row_name: string, row_value: Date | string | number |
   { id: string; label: string; language: string; level: string; }[]) {
     if (row_name === 'Fecha') {
       return row_value.toLocaleString();
@@ -147,8 +140,6 @@ export default function AdditionalInfo(props: AdditionalInfoProps): JSX.Element 
                 <TableCell>Elemento</TableCell>
                 <TableCell align="right">
                   Detalles
-                  {' '}
-                  {ClientDetails?.name}
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -191,3 +182,4 @@ export default function AdditionalInfo(props: AdditionalInfoProps): JSX.Element 
     </>
   );
 }
+
