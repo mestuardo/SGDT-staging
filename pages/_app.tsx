@@ -8,7 +8,9 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import type { KeycloakConfig } from 'keycloak-js';
 import cookie from 'cookie';
 import type { IncomingMessage } from 'http';
+import Container from '@material-ui/core/Container';
 import theme from '../src/theme';
+import Drawer from '../src/drawer';
 
 const keycloakCfg: KeycloakConfig = {
   url: process.env.NEXT_PUBLIC_KEYCLOAK_URL,
@@ -37,24 +39,26 @@ function MyApp({ Component, pageProps, cookies }: AppProps & InitialProps): JSX.
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-      <CssBaseline />
 
-      <ApolloProvider client={client}>
-        <Head>
-          <title>SGDT</title>
-          <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
-        </Head>
-        <SSRKeycloakProvider
-          keycloakConfig={keycloakCfg}
-          persistor={SSRCookies(cookies)}
-        >
-          <Component {...pageProps} />
-        </SSRKeycloakProvider>
-      </ApolloProvider>
-
-    </ThemeProvider>
+    <ApolloProvider client={client}>
+      <Head>
+        <title>SGDT</title>
+        <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+      </Head>
+      <SSRKeycloakProvider
+        keycloakConfig={keycloakCfg}
+        persistor={SSRCookies(cookies)}
+      >
+        <ThemeProvider theme={theme}>
+          <Drawer>
+            <Container component="main" maxWidth="lg">
+              <CssBaseline />
+              <Component {...pageProps} />
+            </Container>
+          </Drawer>
+        </ThemeProvider>
+      </SSRKeycloakProvider>
+    </ApolloProvider>
   );
 }
 

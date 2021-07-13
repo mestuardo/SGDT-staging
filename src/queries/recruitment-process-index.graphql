@@ -3,22 +3,15 @@ query {
     id
     position
     vacancies
-    approxStartDate
-    possibleDuration
-    requestDescription
-    languages {
-      language
-    }
+    client
+    recruiter
   }
   jobOffers: jobOffers {
     id
     position
     vacancies
-    languages {
-      language
-    }
-    approxStartDate
-    possibleDuration
-    offerDescription
+    client
+    recruiter
+    # TODO: add SLAs
   }
 }

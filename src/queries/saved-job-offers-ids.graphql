@@ -1,0 +1,5 @@
+query getSavedJobOffers($getSavedJobOffersProfessionalId: ID!) {
+  getSavedJobOffers(professionalId: $getSavedJobOffersProfessionalId) {
+    id
+  }
+}

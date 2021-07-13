@@ -21,7 +21,9 @@ query Query($getJobOfferId: ID!) {
     questions
     serviceType
     specialRequirements
-    technicalRequirements
-
+    technicalRequirements {
+      requirement
+      obligatoriness
+    }
   }
 }

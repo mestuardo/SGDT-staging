@@ -2,10 +2,9 @@ export interface JobOfferSummaryType {
   id: string,
   position: string,
   vacancies: number,
-  approxStartDate: string,
-  possibleDuration: number,
-  offerDescription: string,
-  languages: { language: string }[],
+  client: string,
+  recruiter: string,
+  // TODO: add SLAs
 }
 
 export interface JobOfferIdsType {
@@ -32,7 +31,7 @@ export interface JobOfferDetailType {
   questions: string[],
   serviceType: string,
   specialRequirements: string[],
-  technicalRequirements: string[],
+  technicalRequirements: { requirement: string, obligatoriness: string }[],
 }
 
 export interface ClientInformationType {

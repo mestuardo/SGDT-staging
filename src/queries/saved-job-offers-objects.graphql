@@ -1,0 +1,37 @@
+query getSavedJobOffers($getSavedJobOffersProfessionalId: ID!) {
+  getSavedJobOffers(professionalId: $getSavedJobOffersProfessionalId) {
+    id
+    position
+    vacancies
+    specialRequirements
+    technicalRequirements {
+      requirement
+      obligatoriness
+    }
+    contractType
+    shiftType
+    maxSalary
+    yearsExperience
+    levelOfStudies
+    formationStatus
+    languages {
+      language
+      level
+    }
+    softSkills
+    questions
+    approxStartDate
+    workAddress {
+      city
+      comuna
+      street
+      number
+    }
+    serviceType
+    possibleDuration
+    requiresComputer
+    requiresReferral
+    requiresPsychological
+    offerDescription
+  }
+}

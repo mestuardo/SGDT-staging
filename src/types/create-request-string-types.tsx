@@ -1,24 +1,18 @@
 export interface CreateRequestTypeString {
   approxStartDate: Date,
   client: string,
-  client_name: string,
   contractType: string,
-  externalRep: string,
-  externalRep_name: string,
   formationStatus: string,
   internalRep:string,
   levelOfStudies: string,
   languages: { id: string; label: string; language: string; level: string; }[],
-  // languages: string,
   maxSalary: string,
   position: string,
   possibleDuration: string,
   recruiter: string,
   requestDescription: string,
   requiresComputer: string,
-  requiresTechnical: string,
   serviceType: string,
-  shift: string,
   shiftType: string,
   softSkills: string,
   specialRequirements: string,
@@ -27,5 +21,5 @@ export interface CreateRequestTypeString {
   vacancies: string,
   workAdress: string,
   yearsExperience: string,
-  [key: string]:string|Date|{ id: string; label: string; language: string; level: string; }[]
+  [key: string]:string | Date | { id: string; label: string; language: string; level: string; }[]
 }

@@ -1,14 +1,17 @@
 import React from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import {
-  AppBar, Toolbar, Typography, IconButton,
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  MenuItem,
+  Menu,
 } from '@material-ui/core';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MailIcon from '@material-ui/icons/Mail';
-import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
 import { useRouter, NextRouter } from 'next/router';
 import Link from 'next/link';
 import { useKeycloak } from '@react-keycloak/ssr';
@@ -32,18 +35,12 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
   },
   title: {
-    // marginBottom: '15px',
-    // marginLeft: '15px',
     cursor: 'pointer',
   },
   space: {
     flexGrow: 1,
   },
 }));
-
-// interface AppBarProps {
-//   login: boolean|undefined,
-// }
 
 type ParsedToken = KeycloakTokenParsed & {
   email?: string
@@ -58,7 +55,6 @@ type ParsedToken = KeycloakTokenParsed & {
 export default function MenuAppBar(): JSX.Element {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   const parsedToken: ParsedToken | undefined = keycloak?.tokenParsed;
-  // const { login } = props;
   const classes = useStyles();
   const router: NextRouter = useRouter();
 
@@ -87,13 +83,13 @@ export default function MenuAppBar(): JSX.Element {
         <Toolbar className={classes.toolbar}>
           {keycloak?.authenticated || (keycloak && parsedToken) ? (
             <Link href="/login">
-              <Typography variant="h6" className={classes.title}>
+              <Typography variant="h6" className={classes.title} component="h6">
                 SDGT
               </Typography>
             </Link>
           ) : (
             <Link href="/">
-              <Typography variant="h6" className={classes.title}>
+              <Typography variant="h6" className={classes.title} component="h6">
                 SDGT
               </Typography>
             </Link>
@@ -108,7 +104,7 @@ export default function MenuAppBar(): JSX.Element {
                 aria-haspopup="true"
                 color="inherit"
               >
-                <Typography variant="body2">
+                <Typography variant="body2" className={classes.title} component="div">
                   {parsedToken?.given_name}
                 </Typography>
               </IconButton>
@@ -172,7 +168,7 @@ export default function MenuAppBar(): JSX.Element {
             </div>
           ) : (
             <Link href="/login">
-              <Typography variant="body2" className={classes.title}>
+              <Typography variant="body2" className={classes.title} component="div">
                 INICIAR SESIÓN
               </Typography>
             </Link>

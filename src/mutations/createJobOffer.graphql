@@ -1,4 +1,4 @@
-mutation CreateJobOfferMutation($createJobOfferId: ID!, $createJobOfferDescription: String, $createJobOfferQuestions: [String]) {
+mutation CreateJobOfferMutation($createJobOfferId: ID!, $createJobOfferDescription: String!, $createJobOfferQuestions: [String!]!) {
   createJobOffer(_id: $createJobOfferId, description: $createJobOfferDescription, questions: $createJobOfferQuestions) {
     id
     position

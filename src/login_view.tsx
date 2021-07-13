@@ -1,23 +1,35 @@
 import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
+import {
+  Avatar,
+  Button,
+  Grid,
+  Hidden,
+  Paper,
+  Typography,
+} from '@material-ui/core';
 import FaceIcon from '@material-ui/icons/Face';
-import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
 import { useRouter } from 'next/router';
-
 import { useKeycloak } from '@react-keycloak/ssr';
-
 import type { KeycloakInstance, KeycloakTokenParsed } from 'keycloak-js';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
-  card: {
-    marginTop: theme.spacing(7),
+  gridContainer: {
+    marginTop: theme.spacing(8),
+    marginBottom: theme.spacing(0),
+    marginLeft: theme.spacing(10),
+    textAlign: 'center',
+    '@media only screen and (max-width: 1250px)': {
+      marginLeft: theme.spacing(0),
+    },
+  },
+  gridItem: {
+    margin: theme.spacing(0, 0),
+    marginLeft: theme.spacing(1),
   },
   paper: {
     margin: theme.spacing(4),
-    height: '424px',
+    height: theme.spacing(68),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -26,10 +38,6 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   avatar: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
   },
   button: {
     margin: theme.spacing(3, 0, 2),
@@ -46,7 +54,7 @@ type ParsedToken = KeycloakTokenParsed & {
   family_name?: string
 };
 
-export default function LoginView(): JSX.Element {
+export default function LoginView() : JSX.Element {
   // Keycloak instance, recieves parameters from the provider
   const { keycloak } = useKeycloak<KeycloakInstance>();
   // The token received by keycloak with the data
@@ -57,36 +65,68 @@ export default function LoginView(): JSX.Element {
   const handleRecruitmentProcessRedirect = () => router.push('/recruitment-process');
 
   return (
+    <Grid
+      container
+      className={classes.gridContainer}
+      justify="center"
+      alignContent="center"
+      alignItems="center"
+      spacing={0}
+    >
+      <Grid
+        item
+        xs={12}
+        lg={8}
+        component={Paper}
+      >
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <FaceIcon />
+          </Avatar>
+          <Typography gutterBottom component="h1" variant="h5">
+            ¡Hola
+            {' '}
+            {parsedToken?.given_name}
+            !
+          </Typography>
+          <Button
+            onClick={handlePersonnelRequestRedirect}
+            variant="contained"
+            color="secondary"
+            className={classes.button}
+          >
+            Nueva solicitud
+          </Button>
+          <Button
+            onClick={handleRecruitmentProcessRedirect}
+            variant="contained"
+            color="secondary"
+            className={classes.button}
+          >
+            Procesos activos
+          </Button>
+        </div>
+      </Grid>
+      <Hidden mdDown>
+        <Grid
+          item
+          md={3}
+          component={Paper}
+          className={classes.gridItem}
+        >
 
-    <Card className={classes.card} raised>
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <FaceIcon />
-        </Avatar>
-        <Typography gutterBottom component="h1" variant="h5">
-          ¡Hola
-          {' '}
-          {parsedToken?.given_name}
-          !
-        </Typography>
-        <Button
-          onClick={handlePersonnelRequestRedirect}
-          variant="contained"
-          color="secondary"
-          className={classes.button}
-        >
-          Nueva solicitud
-        </Button>
-        <Button
-          onClick={handleRecruitmentProcessRedirect}
-          variant="contained"
-          color="secondary"
-          className={classes.button}
-        >
-          Procesos activos
-        </Button>
-      </div>
-    </Card>
+          <div style={{
+            marginTop: '30px',
+            height: '575px',
+            display: 'grid',
+            justifyContent: 'center',
+            textAlign: 'center',
+            placeItems: 'center',
+          }}
+          />
+        </Grid>
+      </Hidden>
+    </Grid>
 
   );
 }

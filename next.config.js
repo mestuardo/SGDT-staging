@@ -10,7 +10,4 @@ module.exports = {
   webpackDevMiddleware: (config) => {
     return config;
   },
-  eslint: {
-    ignoreDuringBuilds: true
-  }
 };

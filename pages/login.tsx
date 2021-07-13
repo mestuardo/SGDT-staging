@@ -2,7 +2,6 @@ import React from 'react';
 import Container from '@material-ui/core/Container';
 import { useKeycloak } from '@react-keycloak/ssr';
 import type { KeycloakInstance, KeycloakTokenParsed } from 'keycloak-js';
-import Appbar from '../src/appbar';
 import LoginView from '../src/login_view';
 import LoginWaitingRoom from '../src/login_waiting_room';
 
@@ -24,15 +23,13 @@ export default function Index(): JSX.Element {
     <>
       {keycloak?.authenticated || (keycloak && parsedToken) ? (
         <>
-          <Appbar />
-          <Container component="main" maxWidth="xs">
+          <Container component="main" maxWidth="lg">
             <LoginView />
           </Container>
         </>
       ) : (
         <>
-          <Appbar />
-          <Container component="main" maxWidth="xs">
+          <Container component="main" maxWidth="lg">
 
             <LoginWaitingRoom />
           </Container>

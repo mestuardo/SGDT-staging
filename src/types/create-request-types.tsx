@@ -13,9 +13,7 @@ export interface CreateRequestType {
   recruiter: string,
   requestDescription: string,
   requiresComputer: boolean,
-  requiresTechnical: boolean,
   serviceType: string,
-  shift: string,
   shiftType: string,
   softSkills: Array<string>,
   specialRequirements: Array<string>,
@@ -24,6 +22,6 @@ export interface CreateRequestType {
   vacancies: number,
   workAdress: string,
   yearsExperience: number,
-  [key: string]: string|Date|boolean | Array<string>|
-  Array<string>|{ language: string, level: string }[]|Array<string>|number
+  [key: string]: string | Date | boolean | Array<string> |
+  Array<string> | { language: string, level: string }[] | Array<string> | number
 }

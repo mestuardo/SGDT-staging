@@ -1,5 +1,5 @@
-query Query($filterApplicationsJobOfferId: ID!) {
-  jobOfferApplications: filterApplications(jobOfferId: $filterApplicationsJobOfferId) {
+query Query($jobOfferId: ID!) {
+  jobOfferApplications: filterApplicationsWithJobOfferId(jobOfferId: $jobOfferId) {
     id
     jobOfferId
     professionalId

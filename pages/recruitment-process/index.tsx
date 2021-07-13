@@ -1,12 +1,10 @@
 import React from 'react';
-import { Box, Container } from '@material-ui/core';
 
 import { useKeycloak } from '@react-keycloak/ssr';
 
 import type { KeycloakInstance, KeycloakTokenParsed } from 'keycloak-js';
 import { useQuery } from '@apollo/client';
 
-import Appbar from '../../src/appbar';
 import RecruitingView from '../../src/views/recruiter_view';
 import LoginWaitingRoom from '../../src/login_waiting_room';
 import RECRUITMENT_PROCESS_INDEX_QUERY from '../../src/queries/recruitment-process-index.graphql';
@@ -30,59 +28,23 @@ export default function Index():JSX.Element {
   const {
     data, loading, error,
   } = useQuery<RecruitmentProcessData>(
-    RECRUITMENT_PROCESS_INDEX_QUERY,
+    RECRUITMENT_PROCESS_INDEX_QUERY, { fetchPolicy: 'network-only' },
+
   );
-  const [currentData, setCurrentData] = React.useState(data);
-  // Data update when we send a new request or delete data
-  React.useEffect(() => {
-    setCurrentData(data);
-  }, [data]);
 
   if (keycloak?.authenticated || (keycloak && parsedToken)) {
     if (loading) {
-      return (
-        <>
-          <Appbar />
-          <Container component="main" maxWidth="lg">
-            <LoginWaitingRoom />
-            ;
-          </Container>
-        </>
-      );
+      return <LoginWaitingRoom />;
     }
     if (error) {
-      return (
-        <>
-          <Appbar />
-          <Container maxWidth="lg">
-            <Box my={4}>
-              <div>Ocurrió un error</div>
-            </Box>
-          </Container>
-        </>
-      );
+      return <div>Ocurrió un error</div>;
     }
 
     return (
-      <>
-        <Appbar />
-        <Container maxWidth="lg">
-          <Box my={4}>
-            <RecruitingView
-              data={currentData as RecruitmentProcessData}
-            />
-          </Box>
-        </Container>
-      </>
+      <RecruitingView
+        data={data as RecruitmentProcessData}
+      />
     );
   }
-  return (
-    <>
-      <Appbar />
-      <Container component="main" maxWidth="lg">
-        <LoginWaitingRoom />
-        ;
-      </Container>
-    </>
-  );
+  return <LoginWaitingRoom />;
 }
