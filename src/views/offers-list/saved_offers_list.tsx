@@ -49,14 +49,16 @@ function SavedOffersList(props: SavedOffersListProps) {
         <p>No tienes ofertas guardadas actualmente.</p>
       )}
       <GridList className={classes.YgridList} cols={cols} cellHeight="auto" style={{ margin: 'auto' }}>
-        {offers.map((jobOffer, index) => (
+        {offers.map((jobOffer) => (
           <GridListTile key={jobOffer.id} className={classes.GridListTile}>
             <PostedApplicationCard
               key={jobOffer.id}
-              id={index}
               jobOffer={jobOffer}
               hideBadge
               isSaved
+              handleOpenDetails={() => { }}
+              onSaveSuccess={() => { }}
+              hideSaveButton={false}
             />
           </GridListTile>
         ))}

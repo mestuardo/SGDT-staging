@@ -85,6 +85,8 @@ function NewOffersList(props: NewOffersListProps) {
             <PostedApplicationCard
               key={jobOffer.id}
               jobOffer={jobOffer}
+              handleOpenDetails={() => { }}
+              hideSaveButton={false}
               hideBadge
               onSaveSuccess={() => handleSaveSuccess(jobOffer.id)}
               isSaved={savedOffersIds.has(jobOffer.id)}

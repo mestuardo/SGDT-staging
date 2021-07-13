@@ -7,7 +7,7 @@ import APPLIED_JOB_OFFERS_OBJECTS from '../../queries/applied-job-offers-objects
 import PostedApplicationCard from '../cards/posted_application_card';
 import recruiterViewStyles from '../recruiter_view/styles';
 import getCols from '../../helpers/get_columns_helper';
-import { JobOfferDetailType } from '../../types/job-offer-query-types';
+import { JobOfferSummaryType } from '../../types/job-offer-query-types';
 
 interface AppliedOffersListProps {
   width: Breakpoint,
@@ -15,10 +15,10 @@ interface AppliedOffersListProps {
 
 function AppliedOffersList(props: AppliedOffersListProps) {
   const { width } = props;
-  const [offers, setOffers] = React.useState<JobOfferDetailType[]>([]);
+  const [offers, setOffers] = React.useState<JobOfferSummaryType[]>([]);
 
   interface AppliedOffersDataType {
-    getAppliedJobOffers: JobOfferDetailType[],
+    getAppliedJobOffers: JobOfferSummaryType[],
   }
 
   const {
@@ -43,14 +43,16 @@ function AppliedOffersList(props: AppliedOffersListProps) {
         <p>No hay ofertas postuladas actualmente.</p>
       )}
       <GridList className={classes.YgridList} cols={cols} cellHeight="auto" style={{ margin: 'auto' }}>
-        {offers.map((jobOffer, index) => (
+        {offers.map((jobOffer) => (
           <GridListTile key={jobOffer.id} className={classes.GridListTile}>
             <PostedApplicationCard
               key={jobOffer.id}
-              id={index}
               jobOffer={jobOffer}
+              handleOpenDetails={() => {}}
+              onSaveSuccess={() => {}}
               hideBadge
               hideSaveButton
+              isSaved={false}
             />
           </GridListTile>
         ))}

@@ -73,8 +73,19 @@ export const postedApplicationCardStyles = makeStyles((theme: Theme) => createSt
   cardContent: {
     textAlign: 'left',
     cursor: 'pointer',
-    height: 110,
+    height: 115,
     overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+      width: 2,
+    },
+    '&::-webkit-scrollbar-track': {
+      borderRadius: '8px',
+      boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      borderRadius: '8px',
+      backgroundColor: 'darkgrey',
+    },
   },
   Badge: {
     color: 'red',

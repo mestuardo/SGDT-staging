@@ -16,6 +16,7 @@ export interface JobOfferDetailType {
   position: string,
   vacancies: number,
   contractType: string,
+  recruiter:string,
   shiftType: string,
   maxSalary: number,
   client: string,

@@ -50,7 +50,7 @@ function MyApp({ Component, pageProps, cookies }: AppProps & InitialProps): JSX.
         persistor={SSRCookies(cookies)}
       >
         <ThemeProvider theme={theme}>
-          <Drawer>
+          <Drawer window2={() => new Window()}>
             <Container component="main" maxWidth="lg">
               <CssBaseline />
               <Component {...pageProps} />
