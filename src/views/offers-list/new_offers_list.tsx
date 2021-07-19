@@ -43,7 +43,7 @@ function NewOffersList(props: NewOffersListProps) {
     networkStatus: allJobOffersNetworkStatus,
   } = useQuery<AllJobOffersDataType>(ALL_JOB_OFFERS_OBJECTS, {
     notifyOnNetworkStatusChange: true,
-    // fetchPolicy: 'no-cache',
+    fetchPolicy: 'network-only',
   });
 
   interface SavedJobOffersDataType {
@@ -63,7 +63,7 @@ function NewOffersList(props: NewOffersListProps) {
     refetch: savedJobOffersRefetch,
   } = useQuery<SavedJobOffersDataType>(SAVED_JOB_OFFERS_IDS, {
     notifyOnNetworkStatusChange: true,
-    // fetchPolicy: 'network-only',
+    fetchPolicy: 'network-only',
     variables: { getSavedJobOffersProfessionalId: professionalId },
   });
 
@@ -76,7 +76,7 @@ function NewOffersList(props: NewOffersListProps) {
     refetch: appliedJobOffersRefetch,
   } = useQuery<AppliedJobOffersDataType>(APPLIED_JOB_OFFERS_IDS, {
     notifyOnNetworkStatusChange: true,
-    // fetchPolicy: 'network-only',
+    fetchPolicy: 'network-only',
     variables: { getAppliedJobOffersProfessionalId: professionalId },
   });
 
@@ -119,22 +119,22 @@ function NewOffersList(props: NewOffersListProps) {
     const appliedSavedJobOffersIdsPromise = appliedJobOffersRefetch();
     Promise.all([
       jobOffersObjectsPromise, appliedSavedJobOffersIdsPromise, savedJobOffersIdsPromise,
-    ]).then(() => {
-      console.log('allJobOffersData', allJobOffersData);
-      console.log('appliedJobOffersData', appliedJobOffersData);
-      console.log('savedJobOffersData', savedJobOffersData);
-      if (savedJobOffersData) {
+    ]).then(([allJobOffersResponse, appliedJobOffersResponse, savedJobOffersResponse]) => {
+      console.log('allJobOffersData', allJobOffersResponse);
+      console.log('appliedJobOffersData', appliedJobOffersResponse);
+      console.log('savedJobOffersData', savedJobOffersResponse);
+      if (savedJobOffersResponse.data) {
         const newSavedIds = new Set(
-          savedJobOffersData.getSavedJobOffers.map((jobOffer) => jobOffer.id),
+          savedJobOffersResponse.data.getSavedJobOffers.map((jobOffer) => jobOffer.id),
         );
         setSavedOffersIds(newSavedIds);
       }
-      if (allJobOffersData) {
-        setOffers(allJobOffersData.jobOffers);
+      if (allJobOffersResponse.data) {
+        setOffers(allJobOffersResponse.data.jobOffers);
       }
-      if (appliedJobOffersData) {
+      if (appliedJobOffersResponse.data) {
         const newAppliedJobOffersIds = new Set(
-          appliedJobOffersData.getAppliedJobOffers.map(
+          appliedJobOffersResponse.data.getAppliedJobOffers.map(
             (jobOffer: ProfessionalJobOfferDetail) => jobOffer.id,
           ),
         );

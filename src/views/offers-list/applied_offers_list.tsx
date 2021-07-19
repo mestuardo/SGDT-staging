@@ -23,19 +23,29 @@ function AppliedOffersList(props: AppliedOffersListProps) {
   }
 
   const {
-    loading, data,
+    loading, data, refetch,
   } = useQuery<AppliedOffersDataType>(APPLIED_JOB_OFFERS_OBJECTS, {
     notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
     variables: { getAppliedJobOffersProfessionalId: professionalId },
   });
   const classes = recruiterViewStyles();
 
+  const fetchOffers = () => {
+    setOffers([]);
+    refetch().then((response) => {
+      if (response.data && response.data.getAppliedJobOffers) {
+        setOffers(response.data.getAppliedJobOffers);
+      }
+    }).catch((error) => { throw (error); });
+  };
+
   const { cols } = getCols(width);
 
   React.useEffect(() => {
-    if (data) setOffers(data.getAppliedJobOffers);
+    fetchOffers();
   },
-  [data]);
+  []);
 
   return (
     <>
