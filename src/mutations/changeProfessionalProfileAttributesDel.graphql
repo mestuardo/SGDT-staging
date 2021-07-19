@@ -1,0 +1,7 @@
+mutation Mutation($deleteProfessionalAttributeProfessionalId: ID!, $deleteProfessionalAttributeArrayAttribute: [String], $deleteProfessionalAttributeStringAttributes: [DeletableProfessionalStrings]) {
+  deleteProfessionalAttribute(professionalId: $deleteProfessionalAttributeProfessionalId, arrayAttribute: $deleteProfessionalAttributeArrayAttribute, stringAttributes: $deleteProfessionalAttributeStringAttributes) {
+    id
+    skills
+    name
+  }
+}

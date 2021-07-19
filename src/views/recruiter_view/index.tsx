@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { SetStateAction } from 'react';
 import {
   InputAdornment,
   Tab,
@@ -13,10 +13,10 @@ import {
   TextField,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
-// import {
-//   ToggleButton,
-//   ToggleButtonGroup,
-// } from '@material-ui/lab';
+import {
+  ToggleButton,
+  ToggleButtonGroup,
+} from '@material-ui/lab';
 import withWidth from '@material-ui/core/withWidth';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 
@@ -85,67 +85,144 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
     </GridList>
   );
 
-  // TODO: sort the requests by createdAt and updatedAt
-  const SortedNewRequests = data.requests;
-  const SLASortedPostedRequests = data.jobOffers;
-  // const StatusSortedPostedRequests = data.jobOffers;
+  const RecentSortedNewRequests = data.requests.slice().sort(
+    (a: RequestSummaryType,
+      b: RequestSummaryType) => b.requestCreationDate - a.requestCreationDate,
+  );
+  const DateAscSortedNewRequests = data.requests.slice().sort(
+    (a: RequestSummaryType,
+      b: RequestSummaryType) => a.requestCreationDate - b.requestCreationDate,
+  );
+  const SLASortedPostedJobOffers = data.jobOffers.slice().sort(
+    (a: JobOfferSummaryType,
+      b: JobOfferSummaryType) => a.sla_start - b.sla_start,
+  );
+  const RecentSortedPostedJobOffers = (
+    data.jobOffers.slice().sort(
+      (a: JobOfferSummaryType,
+        b: JobOfferSummaryType) => b.jobOfferCreationDate - a.jobOfferCreationDate,
+    ));
+  const SortedClosedJobOffers = data.getClosedJobOffers.slice().sort(
+    (a: JobOfferSummaryType,
+      b: JobOfferSummaryType) => b.closeJobOfferDate - a.closeJobOfferDate,
+  );
 
-  const [ShownNewRequests, SetShownNewRequests] = React.useState(SortedNewRequests);
-  const [ShownPostedRequests, SetShownPostedRequests] = React.useState(SLASortedPostedRequests);
+  const [ShownNewRequests, SetShownNewRequests] = React.useState(RecentSortedNewRequests);
+  const [ShownPostedRequests, SetShownPostedRequests] = React.useState(SLASortedPostedJobOffers);
+  const [ShownClosedJobOffers, SetShownClosedJobOffers] = React.useState(SortedClosedJobOffers);
 
   // Here we update the shown cards when the info is updated
   React.useEffect(() => {
-    SetShownPostedRequests(data.jobOffers);
+    SetShownPostedRequests(SLASortedPostedJobOffers);
   },
   [data.jobOffers]);
   React.useEffect(() => {
-    SetShownNewRequests(data.requests);
+    SetShownNewRequests(RecentSortedNewRequests);
   },
   [data.requests]);
+  React.useEffect(() => {
+    SetShownNewRequests(RecentSortedNewRequests);
+  },
+  [data.getClosedJobOffers]);
+
+  const [requestsSortBy, setRequestsSortBy] = React.useState('RECENT');
+  const [jobOfferSortBy, setJobOfferSortBy] = React.useState('SLA');
+  const handleRequestsSortBy = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>,
+    newSort: SetStateAction<string>,
+  ) => {
+    setRequestsSortBy(newSort);
+  };
+  const handleJobOfferSortBy = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>,
+    newSort: SetStateAction<string>,
+  ) => {
+    setJobOfferSortBy(newSort);
+  };
+  const filterRequestDateDesc = () => SetShownNewRequests(RecentSortedNewRequests);
+  const filterRequestDateAsc = () => SetShownNewRequests(DateAscSortedNewRequests);
+
+  const filterJobOfferSLA = () => SetShownPostedRequests(SLASortedPostedJobOffers);
+  const filterJobOfferRecent = () => SetShownPostedRequests(RecentSortedPostedJobOffers);
 
   const [filter, setFilter] = React.useState('');
 
   React.useEffect(() => {
-    SetShownNewRequests(
-      SortedNewRequests.filter(
-        (element) => JSON.stringify(element).toLowerCase().includes(filter.toLowerCase()),
-      ),
-    );
-    SetShownPostedRequests(
-      SLASortedPostedRequests.filter(
+    if (requestsSortBy === 'RECENT') {
+      SetShownNewRequests(
+        RecentSortedNewRequests.filter(
+          (element) => JSON.stringify(element).toLowerCase().includes(filter.toLowerCase()),
+        ),
+      );
+    } else if (requestsSortBy === 'OLD') {
+      SetShownNewRequests(
+        DateAscSortedNewRequests.filter(
+          (element) => JSON.stringify(element).toLowerCase().includes(filter.toLowerCase()),
+        ),
+      );
+    }
+    if (jobOfferSortBy === 'SLA') {
+      SetShownPostedRequests(
+        SLASortedPostedJobOffers.filter(
+          (element) => JSON.stringify(element).toLowerCase().includes(filter.toLowerCase()),
+        ),
+      );
+    } else if (jobOfferSortBy === 'DATE-DESC') {
+      SetShownPostedRequests(
+        RecentSortedPostedJobOffers.filter(
+          (element) => JSON.stringify(element).toLowerCase().includes(filter.toLowerCase()),
+        ),
+      );
+    }
+    SetShownClosedJobOffers(
+      SortedClosedJobOffers.filter(
         (element) => JSON.stringify(element).toLowerCase().includes(filter.toLowerCase()),
       ),
     );
   }, [filter]);
 
-  const searchBarlgUp = (
-    <Hidden mdDown>
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-        <Typography variant="h6" component="div">Solicitudes pendientes</Typography>
-        <TextField
-          style={{ position: 'absolute', marginLeft: '570px', width: 180 }}
-          label="Buscar..."
+  const requestsHeader = (
+    <div className={classes.responsiveHeader}>
+      <Hidden smUp>
+        <Typography
+          variant="body1"
+          component="div"
+        >
+          <Box fontWeight="fontWeightBold">
+            Solicitudes pendientes
+          </Box>
+        </Typography>
+      </Hidden>
+      <div style={{ width: 180, margin: '5px 0px' }}>
+        <ToggleButtonGroup
+          value={requestsSortBy}
+          exclusive
           size="small"
-          variant="outlined"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          InputProps={{
-            className: classes.inputText,
-            endAdornment: (
-              <InputAdornment position="end">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </div>
-    </Hidden>
-  );
+          onChange={handleRequestsSortBy}
+          aria-label="cards filter"
+        >
+          <ToggleButton onClick={filterRequestDateDesc} value="RECENT" aria-label="Descendant date filtered">
+            Recientes
+          </ToggleButton>
+          <ToggleButton onClick={filterRequestDateAsc} value="OLD" aria-label="Ascendant date filtered">
+            Antiguas
+          </ToggleButton>
 
-  const searchBarlgDown = (
-    <Hidden lgUp>
-      <Typography variant="body1" component="div"><Box fontWeight="fontWeightBold">Solicitudes pendientes</Box></Typography>
+        </ToggleButtonGroup>
+
+      </div>
+      <Hidden xsDown>
+        <Typography
+          style={{ margin: '5px 0px' }}
+          variant="h6"
+          component="div"
+        >
+          Solicitudes pendientes
+
+        </Typography>
+      </Hidden>
       <TextField
+        style={{ width: 180, margin: '5px 0px' }}
         label="Buscar..."
         size="small"
         variant="outlined"
@@ -160,7 +237,69 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
           ),
         }}
       />
-    </Hidden>
+    </div>
+
+  );
+  const jobOffersHeader = (
+
+    <div className={classes.responsiveHeader}>
+      <Hidden smUp>
+        <Typography
+          variant="body1"
+          component="div"
+        >
+          <Box fontWeight="fontWeightBold">
+            {tabValue === 3 ? 'Ofertas laborales cerradas' : 'Ofertas laborales publicadas'}
+          </Box>
+        </Typography>
+      </Hidden>
+      {tabValue !== 3 ? (
+        <div style={{ width: 180, margin: '5px 0px' }}>
+          <ToggleButtonGroup
+            value={jobOfferSortBy}
+            exclusive
+            size="small"
+            onChange={handleJobOfferSortBy}
+            aria-label="cards filter"
+          >
+            <ToggleButton onClick={filterJobOfferSLA} value="SLA" aria-label="SLA filtered">
+              SEGÚN SLA
+            </ToggleButton>
+            <ToggleButton onClick={filterJobOfferRecent} value="DATE-DESC" aria-label="Descendant date filtered">
+              Recientes
+            </ToggleButton>
+
+          </ToggleButtonGroup>
+
+        </div>
+      ) : <div style={{ width: 180, margin: '5px 0px' }} />}
+      <Hidden xsDown>
+        <Typography
+          style={{ margin: '5px 0px' }}
+          variant="h6"
+          component="div"
+        >
+          {tabValue === 3 ? 'Ofertas laborales cerradas' : 'Ofertas laborales publicadas'}
+
+        </Typography>
+      </Hidden>
+      <TextField
+        style={{ width: 180, margin: '5px 0px' }}
+        label="Buscar..."
+        size="small"
+        variant="outlined"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        InputProps={{
+          className: classes.inputText,
+          endAdornment: (
+            <InputAdornment position="end">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
+    </div>
 
   );
 
@@ -168,7 +307,7 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
     <Grid
       container
       component="main"
-      justify="center"
+      justifyContent="center"
       alignContent="center"
       alignItems="center"
       className={classes.gridContainer}
@@ -191,7 +330,8 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
           >
             <Tab label="Inicio" id={assignIdToTab(0).id} aria-controls={assignIdToTab(0)['aria-controls']} />
             <Tab label="Solicitudes pendientes" id={assignIdToTab(1).id} aria-controls={assignIdToTab(1)['aria-controls']} />
-            <Tab label="Solicitudes publicadas" id={assignIdToTab(2).id} aria-controls={assignIdToTab(2)['aria-controls']} />
+            <Tab label="Ofertas laborales" id={assignIdToTab(2).id} aria-controls={assignIdToTab(2)['aria-controls']} />
+            <Tab label="Ofertas cerradas" id={assignIdToTab(3).id} aria-controls={assignIdToTab(3)['aria-controls']} />
 
           </Tabs>
         </Paper>
@@ -204,29 +344,34 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
             <Hidden lgUp>
               <Typography variant="body1" component="div"><Box fontWeight="fontWeightBold">Solicitudes pendientes recientes</Box></Typography>
             </Hidden>
-            {renderGridList(classes.XgridList, SortedNewRequests.slice(0, 5))}
+            {renderGridList(classes.XgridList, RecentSortedNewRequests.slice(0, 5))}
 
             {/* Change the font according to the screen size with Hidden */}
             <Hidden mdDown>
-              <Typography variant="h6" component="div">Solicitudes con menor SLA</Typography>
+              <Typography variant="h6" component="div">Ofertas laborales publicadas recientes</Typography>
             </Hidden>
             <Hidden lgUp>
               <Typography variant="body1" component="div"><Box fontWeight="fontWeightBold">Solicitudes con menor SLA</Box></Typography>
             </Hidden>
-            {renderJobOfferGrid(classes.XgridList, SLASortedPostedRequests.slice(0, 5))}
+            {renderJobOfferGrid(classes.XgridList, SLASortedPostedJobOffers.slice(0, 5))}
           </TabPanel>
 
           <TabPanel tabValue={tabValue} index={1}>
-            {searchBarlgUp}
-            {searchBarlgDown}
+            {requestsHeader}
+
             {renderGridList(classes.YgridList, ShownNewRequests)}
           </TabPanel>
 
           <TabPanel tabValue={tabValue} index={2}>
-            {searchBarlgUp}
-            {searchBarlgDown}
 
+            {jobOffersHeader}
             {renderJobOfferGrid(classes.YgridList, ShownPostedRequests)}
+          </TabPanel>
+
+          <TabPanel tabValue={tabValue} index={3}>
+
+            {jobOffersHeader}
+            {renderJobOfferGrid(classes.YgridList, ShownClosedJobOffers)}
           </TabPanel>
         </div>
       </Grid>
@@ -246,23 +391,7 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
             textAlign: 'center',
             placeItems: 'center',
           }}
-          >
-            {/* <ToggleButtonGroup
-              value={filter}
-              exclusive
-              size="small"
-              onChange={handleFilter}
-              aria-label="cards filter"
-            >
-              <ToggleButton onClick={filterSLA} value="SLA" aria-label="SLA filtered">
-                Ordenar por SLA
-              </ToggleButton>
-              <ToggleButton onClick={filterStatus} value="STATUS" aria-label="Status filtered">
-                Ordenar por estado
-              </ToggleButton>
-
-            </ToggleButtonGroup> */}
-          </div>
+          />
 
         </Grid>
       </Hidden>

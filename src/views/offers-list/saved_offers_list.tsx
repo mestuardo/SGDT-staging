@@ -25,7 +25,7 @@ function SavedOffersList(props: SavedOffersListProps) {
     loading, data, refetch,
   } = useQuery<SavedOffersDataType>(SAVED_JOB_OFFERS_OBJECTS, {
     notifyOnNetworkStatusChange: true,
-    variables: { getSavedJobOffersProfessionalId: '60e7cb10b2879c001142d330' },
+    variables: { getSavedJobOffersProfessionalId: '60ec604347a1c50003285e75' },
   });
   const classes = recruiterViewStyles();
 
@@ -36,7 +36,7 @@ function SavedOffersList(props: SavedOffersListProps) {
       setOffers([]);
       refetch().then(() => {
         if (data && data.getSavedJobOffers) setOffers(data.getSavedJobOffers);
-      }).catch((error) => console.log(error));
+      }).catch((error) => { throw (error); });
     };
     fetchOffers();
   },

@@ -1,11 +1,5 @@
 import React from 'react';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import {
-  Box,
-  Collapse,
-  Hidden,
-  IconButton,
   Paper,
   Table,
   TableBody,
@@ -15,63 +9,18 @@ import {
   TableRow,
 } from '@material-ui/core';
 
-import { summaryStyles } from './personnel-request-form-styles';
 import { CreateRequestTypeString } from '../../types/create-request-string-types';
 
 interface AdditionalInfoProps {
   formSchema: CreateRequestTypeString,
 }
 
-// These are the rows for the mobile version of the summary table
-const Row = (props: { row: ReturnType<typeof createData> }) => {
-  const { row } = props;
-  const classes = summaryStyles();
-
-  const [open, setOpen] = React.useState(false);
-
-  return (
-    <>
-      <TableRow className={classes.root}>
-        <TableCell>
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell component="th" scope="row">
-          {row.name}
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box margin={1}>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{row.name}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-
-                  <TableRow key={row.name}>
-                    <TableCell component="th" scope="row" style={{ maxWidth: '200px' }}>
-                      {row.value}
-                    </TableCell>
-
-                  </TableRow>
-
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </>
-  );
-};
-
 const createData = (name: string, value: string | Date | number |
-{ id: string; label: string; language: string; level: string; }[]) => ({ name, value });
+{ id: string; label: string; language: string; level: string; }[] |
+{ requirement: string, obligatoriness: string }[]| {
+  requirement: string;
+  obligatoriness: string
+}) => ({ name, value });
 
 export default function AdditionalInfo(props: AdditionalInfoProps) : JSX.Element {
   const {
@@ -79,9 +28,14 @@ export default function AdditionalInfo(props: AdditionalInfoProps) : JSX.Element
   } = props;
 
   const summaryLabels: { [key:string]:string } = {
-    approxStartDate: 'Fecha',
-    client: 'Client',
-    contractType: 'Tipo de contrato',
+    approxStartDate: 'Fecha ingreso',
+    client: 'Cliente',
+    contractType_1: 'Tipo de contrato 1',
+    possibleDuration_1: 'Duración contrato 1 (Meses)',
+    contractType_2: 'Tipo de contrato 2',
+    possibleDuration_2: 'Duración contrato 2 (Meses)',
+    contractType_3: 'Tipo de contrato 3',
+    possibleDuration_3: 'Duración contrato 3 (Meses)',
     formationStatus: 'Nivel de formación',
     id: 'ID',
     internalRep: 'Representante Interno',
@@ -89,8 +43,12 @@ export default function AdditionalInfo(props: AdditionalInfoProps) : JSX.Element
     languages: 'Idiomas',
     maxSalary: 'Renta máx. Contratación',
     position: 'Cargo requerido',
+    workAdress_city: 'Ciudad',
+    workAdress_street: 'Calle',
+    workAdress_number: 'Número',
+    workAdress_district: 'Comuna',
     possibleDuration: 'Duración de servicio',
-    recruiter: 'Reclutador@',
+    recruiter: 'Reclutador/a',
     requestDescription: 'Funciones del cargo',
     requiresComputer: 'Requiere computador',
     serviceType: 'Tipo de servicio',
@@ -100,8 +58,29 @@ export default function AdditionalInfo(props: AdditionalInfoProps) : JSX.Element
     stage: 'Etapa',
     technicalRequirements: 'Requerimientos técnicos',
     vacancies: 'Vacantes',
-    workAdress: 'Dirección laboral',
     yearsExperience: 'Años de experiencia',
+  };
+  const summaryValues: { [key:string]:string | boolean } = {
+    LOWER_SCHOOL: 'Ed. Básica',
+    HIGH_SCHOOL: 'Ed. Media',
+    TECHNICAL: 'Ed. Técnica',
+    COLLEGE: 'Ed. Universitaria',
+    TITLED: 'Titulado',
+    DESIRABLE: 'Deseable',
+    EXCLUDING: 'Excluyente',
+    GRADUATED: 'Graduado',
+    SUSPENDED: 'Congelado',
+    COMPLETE: 'Completa',
+    INCOMPLETE: 'Incompleta',
+    FIXED: 'Fijo',
+    INDEFINITE: 'Indefinido',
+    PART_TIME: 'Part-Time',
+    FULL_TIME: 'Full-Time',
+    FREELANCE: 'Freelance',
+    INTERNAL: 'Interno',
+    OUTSOURCING: 'Outsourcing',
+    OUTSOURCING_TRANSITORY: 'Transitorio',
+    OUTSOURCING_SELECTION: 'Selección',
   };
 
   const stringLanguages: string[] = formSchema.languages.map(
@@ -109,69 +88,102 @@ export default function AdditionalInfo(props: AdditionalInfoProps) : JSX.Element
       ` ${lang.language} ${lang.level}`
     ),
   );
-  const rows = Object.keys(formSchema).map(
-    (keyName:string) => (keyName !== 'languages' ? createData(summaryLabels[keyName], formSchema[keyName]) : createData(summaryLabels[keyName], stringLanguages.toString())),
+
+  const stringTechnical: string[] = formSchema.technicalRequirements.map(
+    (req:{ requirement: string; obligatoriness: string }) => (
+      ` ${req.requirement} ${req.obligatoriness === 'DESIRABLE' ? 'Deseable' : 'Excluyente'}`
+    ),
   );
 
-  const filteredRows = rows.filter((row) => row.name !== 'ID' && row.name !== 'Etapa' && row.name !== 'Representante Interno');
+  const rows = Object.keys(formSchema).map(
+    (keyName:string) => {
+      if (keyName === 'languages') {
+        return createData(summaryLabels[keyName], stringLanguages.toString());
+      } if (keyName === 'technicalRequirements') {
+        return createData(summaryLabels[keyName], stringTechnical.toString());
+      } if (['techReq_1',
+        'techReq_2',
+        'techReq_3',
+        'techReq_4',
+        'techReq_5',
+        'techReq_6',
+        'techReq_7',
+        'techReq_8',
+        'techReq_9',
+        'techReq_10'].includes(keyName)) { return createData('techReq', ''); }
+      return createData(summaryLabels[keyName], formSchema[keyName]);
+    },
+  );
+
+  const filteredRows = rows.filter((row) => row.name !== '' && row.name !== 'techReq' && row.name !== 'ID' && row.name !== 'Etapa' && row.name !== 'Representante Interno');
 
   const getRowValueLabel = (row_name: string, row_value: Date | string | number |
-  { id: string; label: string; language: string; level: string; }[]) => {
-    if (row_name === 'Fecha') {
-      return row_value.toLocaleString();
+  {
+    requirement: string;
+    obligatoriness: string
+  }[] |
+  {
+    id: string;
+    label: string;
+    language: string;
+    level: string;
+  }[]| {
+    requirement: string;
+    obligatoriness: string
+  }) => {
+    if (row_name === 'Fecha ingreso' && (row_value instanceof Date)) {
+      return row_value.toLocaleString('es-ES', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+      });
+    } if (['Nivel de formación',
+      'Nivel de estudios',
+      'Tipo de contrato 1',
+      'Tipo de contrato 2',
+      'Tipo de contrato 3',
+      'Jornada laboral',
+      'Tipo de servicio',
+    ].includes(row_name)
+      && typeof row_value === 'string') {
+      return summaryValues[row_value];
     }
     return row_value;
   };
 
   return (
     <>
-      <Hidden xsDown>
-        <TableContainer component={Paper}>
-          <Table size="small" aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Elemento</TableCell>
-                <TableCell align="right">
-                  Detalles
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredRows.map((row) => (
-                <TableRow key={row.name}>
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    style={{
-                      maxWidth: '300px',
-                      whiteSpace: 'normal',
-                      wordWrap: 'break-word',
-                    }}
-                  >
-                    {/* Here we need to add the labels according to each row.name */}
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">{getRowValueLabel(row.name, row.value)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Hidden>
-      <Hidden smUp>
 
-        <>
-          <TableContainer component={Paper}>
-            <Table aria-label="collapsible table">
-              <TableBody>
-                {filteredRows.map((row) => (
-                  <Row key={row.name} row={row} />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </>
-      </Hidden>
+      <TableContainer component={Paper}>
+        <Table size="small" aria-label="a dense table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Elemento</TableCell>
+              <TableCell align="right">
+                Detalles
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredRows.map((row) => (
+              <TableRow key={row.name}>
+                <TableCell
+                  component="th"
+                  scope="row"
+                  style={{
+                    maxWidth: '300px',
+                    whiteSpace: 'normal',
+                    wordWrap: 'break-word',
+                  }}
+                >
+                  {/* Here we need to add the labels according to each row.name */}
+                  {row.name}
+                </TableCell>
+                <TableCell align="right">{getRowValueLabel(row.name, row.value)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
     </>
   );
 }

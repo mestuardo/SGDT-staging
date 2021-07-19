@@ -11,7 +11,9 @@ import FaceIcon from '@material-ui/icons/Face';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import { useKeycloak } from '@react-keycloak/ssr';
-import type { KeycloakInstance, KeycloakTokenParsed } from 'keycloak-js';
+import type { KeycloakInstance } from 'keycloak-js';
+
+import ParsedTokenType from './types/keycloak-token-type';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   gridContainer: {
@@ -44,21 +46,11 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
 }));
 
-type ParsedToken = KeycloakTokenParsed & {
-  email?: string
-
-  preferred_username?: string
-
-  given_name?: string
-
-  family_name?: string
-};
-
 export default function LoginView() : JSX.Element {
   // Keycloak instance, recieves parameters from the provider
   const { keycloak } = useKeycloak<KeycloakInstance>();
   // The token received by keycloak with the data
-  const parsedToken: ParsedToken | undefined = keycloak?.tokenParsed;
+  const parsedToken = keycloak?.tokenParsed as ParsedTokenType;
   const classes = useStyles();
   const router = useRouter();
   const handlePersonnelRequestRedirect = () => router.push('/personnel-request');
@@ -68,7 +60,7 @@ export default function LoginView() : JSX.Element {
     <Grid
       container
       className={classes.gridContainer}
-      justify="center"
+      justifyContent="center"
       alignContent="center"
       alignItems="center"
       spacing={0}
@@ -84,10 +76,7 @@ export default function LoginView() : JSX.Element {
             <FaceIcon />
           </Avatar>
           <Typography gutterBottom component="h1" variant="h5">
-            ¡Hola
-            {' '}
-            {parsedToken?.given_name}
-            !
+            {`¡Hola ${parsedToken?.given_name}!`}
           </Typography>
           <Button
             onClick={handlePersonnelRequestRedirect}

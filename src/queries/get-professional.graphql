@@ -8,5 +8,30 @@ query Query($getProfessionalProfessionalId: ID!) {
     specialty
     currentJob
     savedJobOffers
+    profile
+    technicalKnowledge
+    education {
+      id
+      title
+      period
+      description
+    }
+    skills {
+      id
+      title
+      body
+    }
+    pastJobs {
+      id
+      companyName
+      period
+      position
+      functions
+      technologiesUsed
+    }
+    contactInfo {
+      phone
+      email
+    }
   }
 }

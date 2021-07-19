@@ -6,10 +6,12 @@ query Query($getRequestId: ID!) {
     position
     vacancies
     formationStatus
+    recruiter
     approxStartDate
     possibleDuration
     requestDescription
     levelOfStudies
+    serviceType
     languages {
       language
       level
@@ -17,8 +19,19 @@ query Query($getRequestId: ID!) {
     maxSalary
     softSkills
     yearsExperience
+    specialRequirements
     shiftType
     requiresComputer
-
+    technicalRequirements {
+      requirement
+      obligatoriness
+    }
+    workAddress {
+      city
+      country
+      street
+      number
+      comuna
+    }
   }
 }

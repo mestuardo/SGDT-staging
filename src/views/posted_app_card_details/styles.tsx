@@ -38,6 +38,7 @@ const postedAppCardStyles = makeStyles((theme) => ({
     display: 'flex',
     textAlign: 'center',
     justifyContent: 'center',
+    placeContent: 'center',
     borderRadius: 0,
   },
 
@@ -73,6 +74,25 @@ const postedAppCardStyles = makeStyles((theme) => ({
     height: '100px',
     width: '100px',
     alignItems: 'center',
+  },
+  stepperLabel: {
+    fontSize: '11px',
+  },
+}));
+
+export const documentUploadStyles = makeStyles((theme) => ({
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+  input: {
+    display: 'none',
+  },
+  button: {
+    color: 'primary',
+    margin: theme.spacing(1),
+
   },
 }));
 

@@ -24,7 +24,7 @@ const recruiterViewStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     '@media only screen and (max-width: 1279px)': {
       margin: theme.spacing(0),
-      height: theme.spacing(75),
+      height: theme.spacing(77),
     },
   },
   verticalTabs: {
@@ -74,6 +74,17 @@ const recruiterViewStyles = makeStyles((theme) => ({
   },
   inputText: {
     fontSize: 'small',
+  },
+  responsiveHeader: {
+    display: 'flex',
+    flexGrow: 1,
+    justifyContent: 'space-between',
+    '@media only screen and (max-width: 601px)': {
+      display: 'grid',
+      justifyContent: 'center',
+      placeItems: 'center',
+
+    },
   },
 
 }));

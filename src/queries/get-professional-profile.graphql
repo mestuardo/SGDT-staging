@@ -1,0 +1,48 @@
+query Query($getProfessionalProfessionalId: ID!) {
+  getProfessional(professionalId: $getProfessionalProfessionalId) {
+    name
+    firstSurname
+    secondSurname
+    rut
+    specialty
+    currentJob
+    profile
+    institutions
+    technicalKnowledge
+    state
+    education {
+      id
+      title
+      period
+      description
+      educationType {
+        degree
+        completed
+      }
+    }
+    skills {
+      id
+      title
+      body
+    }
+    pastJobs {
+      id
+      companyName
+      period
+      position
+      functions
+      technologiesUsed
+    }
+    contactInfo {
+      phone
+      email
+      address {
+        country
+        city
+        comuna
+        street
+        number
+      }
+    }
+  }
+}

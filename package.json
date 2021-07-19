@@ -10,6 +10,7 @@
         "@material-ui/lab": "*",
         "@material-ui/pickers": "^3.3.10",
         "@react-keycloak/ssr": "^3.0.0",
+        "apollo-upload-client": "^16.0.0",
         "clsx": "latest",
         "cookie": "^0.4.1",
         "date-fns": "latest",
@@ -30,6 +31,7 @@
         "lint": "eslint . --ext .js,.ts,.tsx"
     },
     "devDependencies": {
+        "@types/apollo-upload-client": "^14.1.0",
         "@types/cookie": "^0.4.0",
         "@types/node": "^15.0.1",
         "@types/react": "^17.0.4",
@@ -37,6 +39,7 @@
         "@typescript-eslint/parser": "^4.22.1",
         "eslint": "^7.25.0",
         "eslint-config-airbnb-typescript": "^12.3.1",
+        "eslint-config-next": "^11.0.1",
         "eslint-plugin-import": "^2.22.1",
         "eslint-plugin-jsx-a11y": "^6.4.1",
         "eslint-plugin-react": "^7.23.2",

@@ -1,0 +1,7 @@
+mutation Mutation($jobOfferId: ID!, $messageBody: String!, $senderName: String!, $senderOptions: SenderOptions!) {
+  createMessage(jobOfferId: $jobOfferId, body: $messageBody, senderName: $senderName, senderOptions: $senderOptions) {
+    senderName
+    message
+    senderOptions
+  }
+}

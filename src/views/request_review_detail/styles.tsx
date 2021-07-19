@@ -40,6 +40,26 @@ const requestReviewStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(0, 1),
   },
+  queryDetails: {
+    textAlign: 'left',
+    width: '90%',
+    margin: 'auto',
+    maxWidth: '250px',
+    wordWrap: 'break-word',
+    maxHeight: '250px',
+    overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+      width: 5,
+    },
+    '&::-webkit-scrollbar-track': {
+      borderRadius: '8px',
+      boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      borderRadius: '8px',
+      backgroundColor: 'darkgrey',
+    },
+  },
 }));
 
 export default requestReviewStyles;

@@ -7,6 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import { Typography } from '@material-ui/core';
 import { useMutation, DocumentNode } from '@apollo/client';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -51,7 +52,6 @@ interface NewRequestDialogProps {
   openRejectionDialog: boolean,
   handleCloseParentDialog: () => void,
   handleCloseRejectionDialog: ()=> void,
-  dialogContentID: string,
   applicationInfo: FilterApplicationsType
 }
 
@@ -60,11 +60,10 @@ export default function RejectionDialog(props:NewRequestDialogProps): JSX.Elemen
     openRejectionDialog,
     handleCloseParentDialog,
     handleCloseRejectionDialog,
-    dialogContentID,
     applicationInfo,
   } = props;
   const classes = useStyles();
-  const [msg, setMsg] = React.useState<string>('Estimado postulante, usted no cumple con los requisitos de esta postulación.');
+  const [msg, setMsg] = React.useState<string>('No se cumple con los requisitos de postulación');
   const [nextStatus,
     { loading: nextStatusMutLoading, error: nextStatusMutError }] = useMutation(APPLICATION_STATUS);
 
@@ -73,6 +72,8 @@ export default function RejectionDialog(props:NewRequestDialogProps): JSX.Elemen
       variables: {
         changeApplicationStatusApplicationId: applicationInfo.id,
         changeApplicationStatusStatus: 'REJECTED',
+        changeApplicationStatusMessage: msg,
+        // TODO: mostrar mensaje en tarjeta de applicant_info
       },
       refetchQueries: [{
         query: FILTER_APPLICATIONS as DocumentNode,
@@ -97,12 +98,12 @@ export default function RejectionDialog(props:NewRequestDialogProps): JSX.Elemen
         <Grid
           container
           direction="column"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
         >
-          {dialogContentID}
+          <Typography variant="body1">¿Está seguro de rechazar al profesional?</Typography>
           <TextField
-            label="Escriba un mensaje..."
+            label="Escriba una razón de rechazo..."
             style={{ width: '90%' }}
             margin="normal"
             multiline
@@ -126,7 +127,7 @@ export default function RejectionDialog(props:NewRequestDialogProps): JSX.Elemen
 
         >
 
-          Enviar rechazo postulación
+          Rechazar postulación
           {' '}
           {nextStatusMutLoading && <CircularProgress size={15} />}
           {nextStatusMutError && <CancelIcon color="error" />}

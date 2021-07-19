@@ -1,15 +1,19 @@
-import { red, yellow, green } from '@material-ui/core/colors';
+import {
+  red, yellow, green, blueGrey,
+} from '@material-ui/core/colors';
 
 const statusColor = (status:string) : string => {
   switch (status) {
-    case 'JOB_OFFER':
+    case 'CLOSE':
       return red[500];
-    case 'PSYCHOLOGICAL':
-      return yellow[500];
-    case 'TECHNICAL':
+    case 'MID':
+      return yellow[700];
+    case 'FAR':
       return green[500];
+    case 'CLOSED':
+      return blueGrey[500];
     default:
-      return 'white';
+      return red[500];
   }
 };
 

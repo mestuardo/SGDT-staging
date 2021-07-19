@@ -1,0 +1,12 @@
+mutation Mutation($editProfessionalProfessionalId: ID!, $editProfessionalInput: ProfessionalEdit) {
+  editProfessional(professionalId: $editProfessionalProfessionalId, input: $editProfessionalInput) {
+    id
+    name
+    currentJob
+    specialty
+    state
+    education
+    skills
+    pastJobs
+  }
+}

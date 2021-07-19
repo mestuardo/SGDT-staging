@@ -27,7 +27,7 @@ export default function SignIn() : JSX.Element {
     <Grid
       container
       className={classes.gridContainer}
-      justify="center"
+      justifyContent="center"
       alignContent="center"
       alignItems="center"
       spacing={0}

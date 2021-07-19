@@ -20,27 +20,42 @@ import { summaryLabels } from '../request_review_detail/helpers';
 const formSchema: CreateRequestTypeString = {
   approxStartDate: new Date(),
   client: '',
-  contractType: '',
   formationStatus: '',
   internalRep: '',
   levelOfStudies: '',
   languages: [],
   maxSalary: '',
   position: '',
-  possibleDuration: '',
+  contractType_1: '',
+  possibleDuration_1: '',
+  contractType_2: '',
+  possibleDuration_2: '',
+  contractType_3: '',
+  possibleDuration_3: '',
   recruiter: '',
   requestDescription: '',
   requiresComputer: '',
   requiresTechnical: '',
   serviceType: '',
-  shift: '',
   shiftType: '',
   softSkills: '',
   specialRequirements: '',
-  stage: 'REQUEST',
-  technicalRequirements: '',
+  technicalRequirements: [],
+  techReq_1: { requirement: '', obligatoriness: '' },
+  techReq_2: { requirement: '', obligatoriness: '' },
+  techReq_3: { requirement: '', obligatoriness: '' },
+  techReq_4: { requirement: '', obligatoriness: '' },
+  techReq_5: { requirement: '', obligatoriness: '' },
+  techReq_6: { requirement: '', obligatoriness: '' },
+  techReq_7: { requirement: '', obligatoriness: '' },
+  techReq_8: { requirement: '', obligatoriness: '' },
+  techReq_9: { requirement: '', obligatoriness: '' },
+  techReq_10: { requirement: '', obligatoriness: '' },
   vacancies: '',
-  workAdress: '',
+  workAdress_city: '',
+  workAdress_district: '',
+  workAdress_street: '',
+  workAdress_number: '',
   yearsExperience: '',
 
 };
@@ -52,7 +67,6 @@ export default function RecruitingHeadView() : JSX.Element {
   const handleChange = (event: React.ChangeEvent<unknown>, newValue: number) => {
     setValue(newValue);
   };
-  const dummyHandle = () => { };
   const [previewCardContent, setPreviewCardContent] = React.useState(formSchema);
   const updatePreviewCardContent = (content: CreateRequestTypeString) => (
     setPreviewCardContent(content)
@@ -62,7 +76,7 @@ export default function RecruitingHeadView() : JSX.Element {
     <Grid
       container
       className={classes.gridContainer}
-      justify="center"
+      justifyContent="center"
       alignContent="center"
       alignItems="center"
       spacing={0}
@@ -91,7 +105,7 @@ export default function RecruitingHeadView() : JSX.Element {
         <TabPanel tabValue={value} index={0}>
 
           <RequestForm
-            formSchema={formSchema}
+            formSchema={previewCardContent}
             updatePreviewCardContent={updatePreviewCardContent}
           />
 
@@ -118,7 +132,6 @@ export default function RecruitingHeadView() : JSX.Element {
             <h3>Vista previa</h3>
             <SampleApplicantionCard
               formSchema={previewCardContent}
-              handleOpenDetails={dummyHandle}
             />
             <div className={classes.queryDetails}>
               <Typography variant="caption" component="div">
@@ -127,9 +140,15 @@ export default function RecruitingHeadView() : JSX.Element {
                 {(+previewCardContent.maxSalary).toLocaleString() || '-'}
               </Typography>
               <Typography variant="caption" component="div">
-                <Box fontWeight="fontWeightMedium" display="inline">Duración del trabajo:</Box>
+                <Box fontWeight="fontWeightMedium" display="inline">Años experiencia requeridos:</Box>
                 {' '}
-                {previewCardContent.possibleDuration || '-'}
+                {`${previewCardContent.yearsExperience} años` || '-'}
+              </Typography>
+
+              <Typography variant="caption" component="div">
+                <Box fontWeight="fontWeightMedium" display="inline">Nivel de estudios:</Box>
+                {' '}
+                {summaryLabels[previewCardContent.levelOfStudies] || '-'}
               </Typography>
               <Typography variant="caption" component="div">
                 <Box fontWeight="fontWeightMedium" display="inline">Idiomas:</Box>
@@ -137,9 +156,15 @@ export default function RecruitingHeadView() : JSX.Element {
                 {previewCardContent.languages ? previewCardContent.languages.map((entry:{ language:string; level:string }) => `${entry.language}, ${entry.level}`).join('; ') : '-'}
               </Typography>
               <Typography variant="caption" component="div">
-                <Box fontWeight="fontWeightMedium" display="inline">Nivel de estudios:</Box>
+                <Box fontWeight="fontWeightMedium" display="inline">Requisitios técnicos:</Box>
                 {' '}
-                {summaryLabels[previewCardContent.levelOfStudies] || '-'}
+                {previewCardContent.technicalRequirements.map(
+                  (
+                    tec: { requirement: string, obligatoriness: string },
+                  ) => (
+                    `${tec.requirement}, ${summaryLabels[tec.obligatoriness] as string};`
+                  ),
+                ) || '-'}
               </Typography>
               <Typography variant="caption" component="div">
                 <Box fontWeight="fontWeightMedium" display="inline">Nivel formación:</Box>
@@ -152,14 +177,34 @@ export default function RecruitingHeadView() : JSX.Element {
                 {previewCardContent.softSkills || '-'}
               </Typography>
               <Typography variant="caption" component="div">
+                <Box fontWeight="fontWeightMedium" display="inline">Funciones del cargo:</Box>
+                {' '}
+                {previewCardContent.requestDescription || '-'}
+              </Typography>
+              <Typography variant="caption" component="div">
+                <Box fontWeight="fontWeightMedium" display="inline">Requerimientos especiales:</Box>
+                {' '}
+                {previewCardContent.specialRequirements || '-'}
+              </Typography>
+              <Typography variant="caption" component="div">
+                <Box fontWeight="fontWeightMedium" display="inline">Fecha de ingreso:</Box>
+                {' '}
+                {previewCardContent.approxStartDate.toLocaleDateString() || '-'}
+              </Typography>
+              <Typography variant="caption" component="div">
+                <Box fontWeight="fontWeightMedium" display="inline">Duración del servicio:</Box>
+                {' '}
+                {`${previewCardContent.possibleDuration_1} meses` || '-'}
+              </Typography>
+              <Typography variant="caption" component="div">
                 <Box fontWeight="fontWeightMedium" display="inline">Tipo de servicio:</Box>
                 {' '}
-                {previewCardContent.serviceType || '-'}
+                {summaryLabels[previewCardContent.serviceType] || '-'}
               </Typography>
               <Typography variant="caption" component="div">
                 <Box fontWeight="fontWeightMedium" display="inline">Tipo de contrato:</Box>
                 {' '}
-                {summaryLabels[previewCardContent.contractType] || '-'}
+                {summaryLabels[previewCardContent.contractType_1] || '-'}
               </Typography>
               <Typography variant="caption" component="div">
                 <Box fontWeight="fontWeightMedium" display="inline">Jornada laboral:</Box>
@@ -167,10 +212,11 @@ export default function RecruitingHeadView() : JSX.Element {
                 {summaryLabels[previewCardContent.shiftType] || '-'}
               </Typography>
               <Typography variant="caption" component="div">
-                <Box fontWeight="fontWeightMedium" display="inline">Años experiencia requeridos:</Box>
+                <Box fontWeight="fontWeightMedium" display="inline">Dirección laboral:</Box>
                 {' '}
-                {`${previewCardContent.yearsExperience} años` || '-'}
+                {previewCardContent.workAdress || '-'}
               </Typography>
+
               <Typography variant="caption" component="div">
                 <Box fontWeight="fontWeightMedium" display="inline">Requiere computador:</Box>
                 {' '}

@@ -1,6 +1,20 @@
-mutation CreateJobOfferMutation($createJobOfferId: ID!, $createJobOfferDescription: String!, $createJobOfferQuestions: [String!]!) {
-  createJobOffer(_id: $createJobOfferId, description: $createJobOfferDescription, questions: $createJobOfferQuestions) {
+mutation CreateJobOfferMutation(
+  $createJobOfferId: ID!
+  $createJobOfferDescription: String!
+  $createJobOfferQuestions: [String!]!
+  $SLA_Start: Date
+  $SLA_End: Date
+) {
+  createJobOffer(
+    _id: $createJobOfferId
+    description: $createJobOfferDescription
+    questions: $createJobOfferQuestions
+    sla_start: $SLA_Start
+    sla_end: $SLA_End
+  ) {
     id
     position
+    sla_start
+    sla_end
   }
 }

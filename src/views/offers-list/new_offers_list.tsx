@@ -41,7 +41,7 @@ function NewOffersList(props: NewOffersListProps) {
     refetch: savedJobOffersRefetch,
   } = useQuery<SavedJobOffersDataType>(SAVED_JOB_OFFERS_IDS, {
     notifyOnNetworkStatusChange: true,
-    variables: { getSavedJobOffersProfessionalId: '60e7cb10b2879c001142d330' },
+    variables: { getSavedJobOffersProfessionalId: '60ec604347a1c50003285e75' },
   });
 
   const classes = recruiterViewStyles();
@@ -65,7 +65,7 @@ function NewOffersList(props: NewOffersListProps) {
         setSavedOffersIds(newSavedIds);
       }
       if (allJobOffersData) setOffers(allJobOffersData.jobOffers);
-    }).catch((error) => console.log(error));
+    }).catch((error) => { throw (error); });
   };
 
   React.useEffect(() => {

@@ -1,0 +1,6 @@
+mutation UploadDocumentMutation($document: Upload!, $documentApplicationId: ID!) {
+  uploadApplicationFile(file: $document, applicationId: $documentApplicationId) {
+    filename
+    url
+  }
+}

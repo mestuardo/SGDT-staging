@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { SetStateAction } from 'react';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Avatar,
+  Step,
+  Stepper,
+  StepLabel,
   Badge,
   Box,
-  Button,
   CircularProgress,
   Grid,
   GridList,
@@ -18,13 +19,24 @@ import {
   Typography,
   withWidth,
 } from '@material-ui/core';
+import {
+  ToggleButton,
+  ToggleButtonGroup,
+} from '@material-ui/lab';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useQuery } from '@apollo/client';
+import { QontoStepIcon, QontoConnector } from './QontoStepIcon';
 import postedAppCardStyles from './styles';
 import { JobOfferDetailType } from '../../types/job-offer-query-types';
+import {
+  initProfessional, initApplication, getDialogLabels, getButtons,
+} from './helpers';
 import { GetProfessionalType } from '../../types/get-professional-types';
-import { FilterApplicationDataType, FilterApplicationsType } from '../../types/filter-applications-query-types';
+import {
+  FilterApplicationDataType,
+  FilterApplicationsType,
+} from '../../types/filter-applications-query-types';
 import assignIdToTab from '../../helpers/assign_id_to_tab';
 import getCols from '../../helpers/get_columns_helper';
 import RecruitmentProcessStepper from '../job_offer_process/recruitment_process_stepper';
@@ -35,6 +47,8 @@ import ProfileCard from '../job_offer_process/profile_card';
 import ApplicantInfoDialog from '../job_offer_process/applicant_info_dialog';
 import RejectionDialog from '../job_offer_process/rejection_dialog';
 import ApprovalDialog from '../job_offer_process/approval_dialog';
+import MessageCard from '../messages/message_card';
+import NewMessageCard from '../messages/new_message_card';
 
 interface ProfilesProps{
   reqId: string,
@@ -42,7 +56,7 @@ interface ProfilesProps{
   width: Breakpoint,
 }
 
-function ProfilesView(props:ProfilesProps) : JSX.Element {
+function PostedAppDetail(props:ProfilesProps) : JSX.Element {
   const {
     reqId, jobOfferData, width,
   } = props;
@@ -63,6 +77,104 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
   const [newApplications, setNewApplications] = React.useState<FilterApplicationsType[]>([]);
   const [rejectedApplications,
     setRejectedApplications] = React.useState<FilterApplicationsType[]>([]);
+
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+  const [openRejectionDialog, setOpenRejectionDialog] = React.useState(false);
+  const handleOpenRejectDialog = () => setOpenRejectionDialog(true);
+  const handleCloseRejectionDialog = () => setOpenRejectionDialog(false);
+
+  const [openApprovalDialog, setOpenApprovalDialog] = React.useState(false);
+  const handleOpenApprovalDialog = () => setOpenApprovalDialog(true);
+  const handleCloseApprovalDialog = () => setOpenApprovalDialog(false);
+
+  const [currentProfessional, setCurrentProfessional] = React.useState<GetProfessionalType>(
+    initProfessional,
+  );
+
+  const [currentApplication, setCurrentApplication] = React.useState<FilterApplicationsType>(
+    initApplication,
+  );
+  const handleOpenDialog = (
+    ProfessionalId: string,
+    application: FilterApplicationsType,
+    professionalData: GetProfessionalType,
+  ) => {
+    setCurrentProfessional(professionalData);
+    setCurrentApplication(application);
+    setOpenDialog(true);
+  };
+
+  const [activeStep, setActiveStep] = React.useState(1);
+  const steps = [
+    {
+      key: 'REQUEST',
+      value: (
+        <>
+          <div>{new Date(jobOfferData.requestCreationDate).toLocaleDateString()}</div>
+          {' '}
+          <div>Creación de solicitud</div>
+        </>),
+    },
+    {
+      key: 'JOB_OFFER',
+      value: (
+        <>
+          <div>{new Date(jobOfferData.jobOfferCreationDate).toLocaleDateString()}</div>
+          {' '}
+          <div>Publicación</div>
+        </>),
+    },
+    {
+      key: 'WAIT_CANDIDATES',
+      value: 'Esperando candidatos',
+    },
+    {
+      key: 'EVAL_CANDIDATES',
+      value: 'Evaluando candidatos',
+    },
+    {
+      key: 'CLOSED',
+      value: (
+        <>
+          <div>
+            {jobOfferData.closeMessage
+              ? new Date(jobOfferData.closeJobOfferDate).toLocaleDateString() : null}
+
+          </div>
+          {' '}
+          <div>Cierre del proceso</div>
+        </>),
+    }];
+  const [descDateApps, setDescDateApps] = React.useState<FilterApplicationsType[]>([]);
+  const [ascDateApps, setAscDateApps] = React.useState<FilterApplicationsType[]>([]);
+
+  React.useEffect(() => {
+    if (jobOfferData.closeMessage) {
+      return setActiveStep(4);
+    }
+    if (candidates.length > 0) {
+      return setActiveStep(3);
+    }
+
+    return setActiveStep(2);
+  }, [candidates]);
+  React.useEffect(() => setCurrentApplication(initApplication),
+
+    [applicationsData]);
+
+  const [applicationsSortBy, setApplicationsSortBy] = React.useState('DATE-DESC');
+  const handleApplicationsSortBy = (
+    event: React.MouseEvent<HTMLElement, MouseEvent>,
+    newSort: SetStateAction<string>,
+  ) => {
+    setApplicationsSortBy(newSort);
+  };
+  const filterAppsDateDesc = () => setNewApplications(descDateApps);
+  const filterAppsDateAsc = () => setNewApplications(ascDateApps);
+
   React.useEffect(() => {
     if (applicationsData !== undefined) {
       setCandidates(applicationsData.jobOfferApplications.filter(
@@ -70,11 +182,20 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
           application.stage !== 'JOB_OFFER' && application.status !== 'REJECTED'
         ),
       ));
-      setNewApplications(applicationsData.jobOfferApplications.filter(
+      const newApps = applicationsData.jobOfferApplications.filter(
         (application: FilterApplicationsType) => (
-          application.stage === 'JOB_OFFER'
+          application.stage === 'JOB_OFFER' && application.status !== 'REJECTED'
         ),
+      );
+      setAscDateApps(newApps.slice().sort(
+        (a: FilterApplicationsType,
+          b: FilterApplicationsType) => b.applicationCreationDate - a.applicationCreationDate,
       ));
+      setDescDateApps(newApps.slice().sort(
+        (a: FilterApplicationsType,
+          b: FilterApplicationsType) => a.applicationCreationDate - b.applicationCreationDate,
+      ));
+      setNewApplications(newApps);
       setRejectedApplications(applicationsData.jobOfferApplications.filter(
         (application: FilterApplicationsType) => (
           application.status === 'REJECTED'
@@ -83,118 +204,11 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
     }
   }, [applicationsData]);
 
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [dialogContentID, setDialogContentID] = React.useState('');
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-  const [openRejectionDialog, setOpenRejectionDialog] = React.useState(false);
-  const handleOpenRejectDialog = () => setOpenRejectionDialog(true);
-  const handleCloseRejectionDialog = () => setOpenRejectionDialog(false);
-  const [openApprovalDialog, setOpenApprovalDialog] = React.useState(false);
-  const handleOpenApprovalDialog = () => setOpenApprovalDialog(true);
-  const handleCloseApprovalDialog = () => setOpenApprovalDialog(false);
-  const initProfessional: GetProfessionalType = {
-    id: '',
-    name: '',
-    firstSurname: '',
-    secondSurname: '',
-    rut: '',
-    specialty: '',
-    currentJob: '',
-    savedJobOffers: [''],
-  };
-  const [currentProfessional, setCurrentProfessional] = React.useState<GetProfessionalType>(
-    initProfessional,
-  );
-  const initApplication: FilterApplicationsType = {
-    id: '',
-    jobOfferId: '',
-    professionalId: '',
-    status: '',
-    recruiterId: '',
-    questions: [''],
-    answers: [''],
-    assessment: '',
-    stage: '',
-  };
-  const [currentApplication, setCurrentApplication] = React.useState<FilterApplicationsType>(
-    initApplication,
-  );
-  const handleOpenDialog = (
-    ProfessionalId:string,
-    application: FilterApplicationsType,
-    professionalData: GetProfessionalType,
-  ) => {
-    setCurrentProfessional(professionalData);
-    setCurrentApplication(application);
-    setDialogContentID(ProfessionalId);
-    setOpenDialog(true);
-  };
-
-  const getButtons = (status: string) => {
-    switch (status) {
-      case 'REJECTED':
-        return (
-          <>
-            <Avatar className={classes.avatar} variant="rounded" />
-            <h2>
-              {currentProfessional.name }
-              {' '}
-              {currentProfessional.firstSurname}
-            </h2>
-            <div>{currentProfessional.specialty}</div>
-            <div>{currentProfessional.rut}</div>
-            <div>{currentProfessional.currentJob}</div>
-          </>
-        );
-      case 'IN_PROCESS':
-        return (
-          <>
-            <Avatar className={classes.avatar} variant="rounded" />
-            <h2>
-              {currentProfessional.name}
-              {' '}
-              {currentProfessional.firstSurname}
-            </h2>
-            <div>{currentProfessional.specialty}</div>
-            <div>{currentProfessional.rut}</div>
-            <div>{currentProfessional.currentJob}</div>
-            <Button onClick={handleOpenApprovalDialog} variant="contained" color="secondary">
-              {currentApplication.stage === 'JOB_OFFER'
-                ? 'CONVERTIR EN CANDIDATO'
-                : 'PASAR A SIGUIENTE FASE'}
-            </Button>
-            <Button onClick={handleOpenRejectDialog} style={{ color: 'red' }}>
-              Rechazar
-            </Button>
-          </>
-        );
-      case 'ACCEPTED':
-        return (
-          <>
-            <Avatar className={classes.avatar} variant="rounded" />
-            <h2>
-              {currentProfessional.name}
-              {' '}
-              {currentProfessional.firstSurname}
-            </h2>
-            <div>{currentProfessional.specialty}</div>
-            <div>{currentProfessional.rut}</div>
-            <div>{currentProfessional.currentJob}</div>
-            <Button> Enviar archivos</Button>
-          </>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <Grid
       container
       component="main"
-      justify="center"
+      justifyContent="center"
       alignContent="center"
       className={classes.gridContainer}
       spacing={0}
@@ -227,9 +241,14 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
             />
 
             <Tab
-              label={<Badge badgeContent={rejectedApplications.length} color="error">Postulaciones rechazadas</Badge>}
+              label={<Badge badgeContent={rejectedApplications.length} color="error">Candidatos rechazados</Badge>}
               id={assignIdToTab(2).id}
               aria-controls={assignIdToTab(2)['aria-controls']}
+            />
+            <Tab
+              label="Mensajes"
+              id={assignIdToTab(3).id}
+              aria-controls={assignIdToTab(3)['aria-controls']}
             />
           </Tabs>
 
@@ -241,11 +260,40 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography className={classes.accordionHeading} variant="h6" component="div">
-                <Box fontWeight="fontWeightBold">
-                  {`Oferta ${jobOfferData.position}`}
-                </Box>
-              </Typography>
+              <div style={{ margin: 'auto' }}>
+                <Typography className={classes.accordionHeading} variant="h6" component="div">
+                  <Box fontWeight="fontWeightBold">
+                    {`Oferta ${jobOfferData.position}`}
+                  </Box>
+                </Typography>
+                <Stepper
+                  style={{ paddingBottom: 0, paddingTop: 10 }}
+                  alternativeLabel
+                  activeStep={activeStep}
+                  connector={<QontoConnector />}
+                >
+                  {steps.map((label) => (
+                    <Step key={label.key}>
+
+                      <StepLabel
+                        classes={{ label: classes.stepperLabel }}
+                        StepIconComponent={QontoStepIcon}
+                      >
+                        <Hidden smDown>{label.value}</Hidden>
+                      </StepLabel>
+
+                    </Step>
+                  ))}
+                </Stepper>
+                <Hidden mdUp>
+                  <Typography
+                    variant="body2"
+                  >
+                    {steps[activeStep].value}
+
+                  </Typography>
+                </Hidden>
+              </div>
             </AccordionSummary>
             <AccordionDetails style={{ margin: 'auto' }}>
               <JobOfferDetails jobOffer={jobOfferData} />
@@ -253,6 +301,31 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
           </Accordion>
         </Paper>
         <TabPanel tabValue={value} index={0}>
+          <ToggleButtonGroup
+            style={{ width: 180, height: 30 }}
+            value={applicationsSortBy}
+            exclusive
+            size="small"
+            onChange={handleApplicationsSortBy}
+            aria-label="cards filter"
+          >
+            <ToggleButton
+              onClick={filterAppsDateDesc}
+              value="DATE-DESC"
+              aria-label="Descendant date filtered"
+            >
+              Recientes
+            </ToggleButton>
+            <ToggleButton
+              onClick={filterAppsDateAsc}
+              value="DATE-ASC"
+              aria-label="Ascendant date filtered"
+            >
+              Antiguos
+
+            </ToggleButton>
+
+          </ToggleButtonGroup>
           <GridList cellHeight="auto" cols={cols} className={classes.YgridList} style={{ margin: 'auto' }}>
             {newApplications.length > 0 ? (
               newApplications.map((newApp) => (
@@ -265,24 +338,11 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
                   />
 
                 </GridListTile>
-              ))) : <div style={{ textAlign: 'center', width: '100%', alignSelf: 'center' }}>No hay postulantes en esta Oferta Laboral</div>}
-
-          </GridList>
-        </TabPanel>
-        <TabPanel tabValue={value} index={2}>
-          <GridList cellHeight="auto" cols={cols} className={classes.YgridList} style={{ margin: 'auto' }}>
-            {rejectedApplications.length > 0 ? (
-              rejectedApplications.map((newApp) => (
-                <GridListTile key={newApp.id} className={classes.GridListTile}>
-
-                  <ProfileCard
-                    key={newApp.id}
-                    application={newApp}
-                    handleOpenDialog={handleOpenDialog}
-                  />
-
-                </GridListTile>
-              ))) : <div style={{ textAlign: 'center', width: '100%', alignSelf: 'center' }}>No hay postulantes rechazados en esta Oferta Laboral</div>}
+              ))) : (
+                <div style={{ textAlign: 'center', width: '100%', alignSelf: 'center' }}>
+                  No hay postulantes en esta Oferta Laboral
+                </div>
+            )}
 
           </GridList>
         </TabPanel>
@@ -304,6 +364,45 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
 
         </TabPanel>
 
+        <TabPanel tabValue={value} index={2}>
+          <GridList cellHeight="auto" cols={cols} className={classes.YgridList} style={{ margin: 'auto' }}>
+            {rejectedApplications.length > 0 ? (
+              rejectedApplications.map((newApp) => (
+                <GridListTile key={newApp.id} className={classes.GridListTile}>
+
+                  <ProfileCard
+                    key={newApp.id}
+                    application={newApp}
+                    handleOpenDialog={handleOpenDialog}
+                  />
+
+                </GridListTile>
+              ))) : (
+                <div style={{ textAlign: 'center', width: '100%', alignSelf: 'center' }}>
+                  No hay postulantes rechazados en esta Oferta Laboral
+                </div>
+            )}
+
+          </GridList>
+        </TabPanel>
+
+        <TabPanel tabValue={value} index={3}>
+          <GridList cellHeight="auto" cols={1} className={classes.YgridList} style={{ margin: 'auto' }}>
+            {jobOfferData.messages.map((currentMessage) => (
+              <GridListTile key={currentMessage.senderName} className={classes.GridListTile}>
+                <MessageCard
+                  key={currentMessage.senderName}
+                  message={currentMessage}
+                />
+              </GridListTile>
+            ))}
+            <NewMessageCard
+              jobOfferId={jobOfferData.id}
+            />
+
+          </GridList>
+        </TabPanel>
+
       </Grid>
       <Hidden mdDown>
         <Grid
@@ -313,7 +412,6 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
           className={classes.gridItem}
         >
           <div style={{
-            marginTop: '48px',
             height: '480px',
             display: 'grid',
             justifyContent: 'center',
@@ -321,8 +419,20 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
             placeItems: 'center',
           }}
           >
-
-            {getButtons(currentApplication.status)}
+            <Typography variant="h6">
+              {currentApplication !== undefined ? getDialogLabels(currentApplication)[0] : ''}
+            </Typography>
+            <Typography variant="body1">
+              {currentApplication !== undefined ? getDialogLabels(currentApplication)[1] : ''}
+            </Typography>
+            {getButtons(
+              classes.avatar,
+              currentProfessional,
+              currentApplication,
+              jobOfferData.id,
+              handleOpenRejectDialog,
+              handleOpenApprovalDialog,
+            )}
 
           </div>
 
@@ -332,25 +442,22 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
         <ApplicantInfoDialog
           openDialog={openDialog}
           handleCloseDialog={handleCloseDialog}
-          dialogTitle="Detalles postulante"
-          dialogContentID={dialogContentID}
+          dialogTitle={currentApplication !== undefined ? getDialogLabels(currentApplication)[0] : ''}
           applicationInfo={currentApplication}
           professionalInfo={currentProfessional}
-          step="Postulación"
+          step={currentApplication !== undefined ? getDialogLabels(currentApplication)[1] : ''}
         />
       </Hidden>
       <RejectionDialog
         openRejectionDialog={openRejectionDialog}
         handleCloseParentDialog={handleCloseDialog}
         handleCloseRejectionDialog={handleCloseRejectionDialog}
-        dialogContentID={dialogContentID}
         applicationInfo={currentApplication}
       />
       <ApprovalDialog
         openApprovalDialog={openApprovalDialog}
         handleCloseParentDialog={handleCloseDialog}
         handleCloseApprovalDialog={handleCloseApprovalDialog}
-        dialogContentID={dialogContentID}
         applicationInfo={currentApplication}
       />
 
@@ -359,4 +466,4 @@ function ProfilesView(props:ProfilesProps) : JSX.Element {
   );
 }
 
-export default withWidth()(ProfilesView);
+export default withWidth()(PostedAppDetail);

@@ -47,15 +47,54 @@ export const applicationCardStyles = makeStyles((theme: Theme) => createStyles({
     color: '#fff',
   },
   cardContent: {
+    cursor: 'pointer',
     textAlign: 'left',
+  },
+}));
+
+export const profileCardStyles = makeStyles((theme: Theme) => createStyles({
+  rootDialog: {
+    margin: theme.spacing(1.5),
+    width: '100%',
+  },
+  root: {
+    margin: theme.spacing(1.5),
+    width: '30%',
+    height: '100%',
+  },
+  cardHeader: {
+    marginBottom: 0,
+    paddingBottom: 0,
+  },
+  icon: {
+    color: '#fff',
+  },
+  crossIcon: {
+    color: '#fff',
+    height: '1%',
+    width: '5%',
+    marginTop: '3%',
+  },
+  cardContent: {
+    textAlign: 'left',
+    display: 'flex',
+    height: '100%',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  cardForm: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '25%',
   },
 }));
 
 export const postedApplicationCardStyles = makeStyles((theme: Theme) => createStyles({
   root: {
     maxWidth: 230,
-    margin: theme.spacing(1),
-    maxHeight: 210,
+    margin: theme.spacing(0.5),
+    maxHeight: 250,
   },
   cardHeader: {
     marginBottom: 0,
@@ -73,21 +112,22 @@ export const postedApplicationCardStyles = makeStyles((theme: Theme) => createSt
   cardContent: {
     textAlign: 'left',
     cursor: 'pointer',
-    height: 115,
-    overflowY: 'auto',
-    '&::-webkit-scrollbar': {
-      width: 2,
-    },
-    '&::-webkit-scrollbar-track': {
-      borderRadius: '8px',
-      boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
-    },
-    '&::-webkit-scrollbar-thumb': {
-      borderRadius: '8px',
-      backgroundColor: 'darkgrey',
-    },
+    height: 120,
   },
-  Badge: {
-    color: 'red',
+  badgeDefault: {
+    color: 'white',
+    backgroundColor: 'red',
+  },
+  badgeAccepted: {
+    color: 'white',
+    backgroundColor: 'green',
+  },
+  badgePsy: {
+    color: 'black',
+    backgroundColor: 'orange',
+  },
+  badgeTech: {
+    color: 'white',
+    backgroundColor: 'blue',
   },
 }));

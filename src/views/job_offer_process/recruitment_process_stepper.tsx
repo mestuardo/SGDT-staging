@@ -49,15 +49,16 @@ function CustomizedSteppers(props:StepperProps) : JSX.Element {
 
   const getStepContent = (step: number) => {
     const StageByStep: { [key: string]: number } = {
-      TECHNICAL: 0,
-      PSYCHOLOGICAL: 1,
+      PRE_INTERVIEW: 0,
+      TECHNICAL: 1,
+      PSYCHOLOGICAL: 2,
     };
     const currentJobApplications = jobOfferApplications.filter(
       (application: FilterApplicationsType) => (
         application.status !== 'REJECTED'
       ),
     );
-    if (step < 2) {
+    if (step < 3) {
       const inProgressApplications = currentJobApplications.filter(
         (application: FilterApplicationsType) => (
           application.status !== 'ACCEPTED'

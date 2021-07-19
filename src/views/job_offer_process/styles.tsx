@@ -54,7 +54,7 @@ export const jobOfferDetailStyles = makeStyles((theme) => ({
 
 export const profileCardStyles = makeStyles((theme: Theme) => createStyles({
   root: {
-    maxWidth: 200,
+    maxWidth: 230,
     margin: theme.spacing(0.5),
   },
   cardHeader: {
@@ -69,6 +69,7 @@ export const profileCardStyles = makeStyles((theme: Theme) => createStyles({
   },
   cardContent: {
     textAlign: 'left',
+    height: theme.spacing(12),
   },
 }));
 

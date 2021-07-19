@@ -1,13 +1,23 @@
 query Query($jobOfferId: ID!) {
-  jobOfferApplications: filterApplicationsWithJobOfferId(jobOfferId: $jobOfferId) {
+  jobOfferApplications: filterApplicationsWithJobOfferId(
+    jobOfferId: $jobOfferId
+  ) {
     id
     jobOfferId
     professionalId
+    applicationCreationDate
+    lastStageDate
+    decisionDate
     status
     recruiterId
     questions
     answers
     assessment
     stage
+    rejectedMessage
+    files {
+      filename
+      url
+    }
   }
 }

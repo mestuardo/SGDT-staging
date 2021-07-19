@@ -1,0 +1,11 @@
+mutation CloseJobOfferMutation(
+  $closeJobOfferJobOfferId: ID!
+  $closeJobOfferCloseMessage: String
+) {
+  closeJobOffer(
+    jobOfferId: $closeJobOfferJobOfferId
+    closeMessage: $closeJobOfferCloseMessage
+  ) {
+    offerDescription
+  }
+}

@@ -88,8 +88,30 @@ export default function ProfileCard(props: ProfileCardProps) : JSX.Element {
 
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Especialidad:</Box>
+            {' '}
             {`${professional.specialty}`}
           </Typography>
+          <Typography variant="caption" component="div">
+            <Box fontWeight="fontWeightMedium" display="inline">F. postulación:</Box>
+            {' '}
+            {`${new Date(application.applicationCreationDate).toLocaleDateString()}`}
+          </Typography>
+          {(application.status === 'IN_PROCESS' && application.stage !== 'JOB_OFFER') ? (
+            <Typography variant="caption" component="div">
+              <Box fontWeight="fontWeightMedium" display="inline">F. Cambio fase:</Box>
+              {`${new Date(application.lastStageDate).toLocaleDateString()}`}
+            </Typography>
+          ) : null}
+          {application.status !== 'IN_PROCESS' ? (
+            <Typography variant="caption" component="div">
+              <Box fontWeight="fontWeightMedium" display="inline">
+                F.
+                {' '}
+                {application.status === 'ACCEPTED' ? 'aceptación: ' : 'rechazo: ' }
+              </Box>
+              {`${new Date(application.decisionDate).toLocaleDateString()}`}
+            </Typography>
+          ) : null}
 
         </CardContent>
       </CardActionArea>

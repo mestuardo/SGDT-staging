@@ -8,24 +8,30 @@ import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 
 import { useColorlibStepIconStyles } from './styles';
 
-export const ContractTypes: { [key:string]:string } = {
+export const summaryLabels: { [key:string]:string | boolean } = {
+  LOWER_SCHOOL: 'Ed. Básica',
+  HIGH_SCHOOL: 'Ed. Media',
+  TECHNICAL: 'Ed. Técnica',
+  COLLEGE: 'Ed. Universitaria',
+  TITLED: 'Titulado',
+  DESIRABLE: 'Deseable',
+  EXCLUDING: 'Excluyente',
+  GRADUATED: 'Graduado',
+  SUSPENDED: 'Congelado',
+  COMPLETE: 'Completa',
+  INCOMPLETE: 'Incompleta',
   FIXED: 'Fijo',
   INDEFINITE: 'Indefinido',
+  PART_TIME: 'Part-Time',
+  FULL_TIME: 'Full-Time',
+  FREELANCE: 'Freelance',
+  INTERNAL: 'Interno',
+  OUTSOURCING: 'Outsourcing',
+  OUTSOURCING_TRANSITORY: 'Transitorio',
+  OUTSOURCING_SELECTION: 'Selección',
 };
 
-export const LevelOfStudies: { [key: string]: string } = {
-  LOWER_SCHOOL: 'Enseñanza básica',
-  HIGH_SCHOOL: 'Enseñanza media',
-  TECHNICAL: 'Técnico',
-  COLLEGE: 'Universitario',
-};
-
-export const FormationStatus: { [key: string]: string } = {
-  COMPLETE: 'completo',
-  INCOMPLETE: 'incompleto',
-};
-
-export const getSteps = () : string[] => ['Entrevista técnica', 'Entrevista psicolaboral', 'Selección final'];
+export const getSteps = () : string[] => ['Candidatos iniciales', 'Entrevista técnica', 'Entrevista psicolaboral', 'Selección final'];
 
 export const ColorlibStepIcon = (props: StepIconProps) : JSX.Element => {
   const classes = useColorlibStepIconStyles();
@@ -33,8 +39,8 @@ export const ColorlibStepIcon = (props: StepIconProps) : JSX.Element => {
 
   const icons: { [index: string]: React.ReactElement } = {
     1: <AccountCircleIcon />,
-    2: <GroupAddIcon />,
-    3: <PolicyIcon />,
+    2: <PolicyIcon />,
+    3: <GroupAddIcon />,
     4: <AssignmentTurnedInIcon />,
   };
 

@@ -3,6 +3,12 @@ query Query($getJobOfferId: ID!) {
     id
     client
     contractType
+    requestCreationDate
+    jobOfferCreationDate
+    closeJobOfferDate
+    closeMessage
+    sla_start
+    sla_end
     position
     vacancies
     formationStatus
@@ -24,6 +30,12 @@ query Query($getJobOfferId: ID!) {
     technicalRequirements {
       requirement
       obligatoriness
+    }
+    messages {
+      senderName
+      message
+      senderOptions
+      createdAt
     }
   }
 }

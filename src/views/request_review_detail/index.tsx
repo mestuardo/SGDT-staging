@@ -1,5 +1,4 @@
 import React from 'react';
-
 import {
   Box,
   Button,
@@ -47,7 +46,8 @@ const ValidationSchema = Yup.object().shape({
   SLA_1: Yup.date().nullable()
     .required('Ingrese una fecha para el SLA de inicio'),
   SLA_2: Yup.date().nullable()
-    .required('Ingrese una fecha para el SLA de fin'),
+    .required('Ingrese una fecha para el SLA de fin')
+    .min(Yup.ref('SLA_1'), 'El SLA de fin no puede ser menor al de inicio'),
   description: Yup.string()
     .required('Ingrese una descripción para la oferta de trabajo'),
   question_1: Yup.string()
@@ -90,12 +90,21 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
 
   const redirectOnSubmit = () => router.push('/recruitment-process/');
 
+  const [SLA_1, setSLA1] = React.useState<Date|null>(null);
+  const [SLA_2, setSLA2] = React.useState<Date | null>(null);
+  const [description, setDescription] = React.useState('');
+  const [question1, setQuestion1] = React.useState('');
+  const [question2, setQuestion2] = React.useState('');
+  const [question3, setQuestion3] = React.useState('');
+  const [question4, setQuestion4] = React.useState('');
+  const [question5, setQuestion5] = React.useState('');
+
   return (
     <Grid
       className={classes.root}
       container
       direction="row"
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       spacing={0}
     >
@@ -106,21 +115,29 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
         component={Paper}
       >
         <h2>Revisión de solicitud</h2>
-        <div style={{ textAlign: 'left', width: '70%', margin: 'auto' }}>
+        <div style={{
+          overflowY: 'auto',
+          textAlign: 'left',
+          width: '70%',
+          margin: 'auto',
+          maxHeight: '230px',
+        }}
+        >
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Salario máximo:</Box>
             {' $'}
-            {requestData.maxSalary.toLocaleString() || '-'}
+            {(+requestData.maxSalary).toLocaleString() || '-'}
           </Typography>
           <Typography variant="caption" component="div">
-            <Box fontWeight="fontWeightMedium" display="inline">Vacantes:</Box>
+            <Box fontWeight="fontWeightMedium" display="inline">Años experiencia requeridos:</Box>
             {' '}
-            {requestData.vacancies || '-'}
+            {`${requestData.yearsExperience} años` || '-'}
           </Typography>
+
           <Typography variant="caption" component="div">
-            <Box fontWeight="fontWeightMedium" display="inline">Duración del trabajo:</Box>
+            <Box fontWeight="fontWeightMedium" display="inline">Nivel de estudios:</Box>
             {' '}
-            {requestData.possibleDuration || '-'}
+            {summaryLabels[requestData.levelOfStudies] || '-'}
           </Typography>
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Idiomas:</Box>
@@ -128,9 +145,15 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
             {requestData.languages ? requestData.languages.map((entry:{ language:string; level:string }) => `${entry.language}, ${entry.level}`).join('; ') : '-'}
           </Typography>
           <Typography variant="caption" component="div">
-            <Box fontWeight="fontWeightMedium" display="inline">Nivel de estudios:</Box>
+            <Box fontWeight="fontWeightMedium" display="inline">Requisitios técnicos:</Box>
             {' '}
-            {summaryLabels[requestData.levelOfStudies] || '-'}
+            {requestData.technicalRequirements.map(
+              (
+                tec: { requirement: string, obligatoriness: string },
+              ) => (
+                `${tec.requirement}, ${summaryLabels[tec.obligatoriness] as string};`
+              ),
+            ) || '-'}
           </Typography>
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Nivel formación:</Box>
@@ -140,28 +163,49 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Habilidades blandas:</Box>
             {' '}
-            {requestData.softSkills.map((softSkill:string) => softSkill).join(', ') || '-'}
+            {requestData.softSkills.toString().replace(',', ', ') || '-'}
+          </Typography>
+          <Typography variant="caption" component="div">
+            <Box fontWeight="fontWeightMedium" display="inline">Funciones del cargo:</Box>
+            {' '}
+            {requestData.requestDescription || '-'}
+          </Typography>
+          <Typography variant="caption" component="div">
+            <Box fontWeight="fontWeightMedium" display="inline">Requerimientos especiales:</Box>
+            {' '}
+            {requestData.specialRequirements.toString().replace(',', ', ') || '-'}
+          </Typography>
+          <Typography variant="caption" component="div">
+            <Box fontWeight="fontWeightMedium" display="inline">Fecha de ingreso:</Box>
+            {' '}
+            {new Date(requestData.approxStartDate).toLocaleDateString() || '-'}
           </Typography>
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Tipo de servicio:</Box>
             {' '}
-            {requestData.serviceType || '-'}
+            {summaryLabels[requestData.serviceType] || '-'}
           </Typography>
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Tipo de contrato:</Box>
             {' '}
-            {summaryLabels[requestData.contractType] || '-'}
+            {requestData.contractType[0] === -1 ? 'Indefinido' : 'Fijo' || '-'}
           </Typography>
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Jornada laboral:</Box>
             {' '}
             {summaryLabels[requestData.shiftType] || '-'}
           </Typography>
+
           <Typography variant="caption" component="div">
-            <Box fontWeight="fontWeightMedium" display="inline">Años experiencia requeridos:</Box>
+            <Box fontWeight="fontWeightMedium" display="inline">Dirección laboral:</Box>
             {' '}
-            {`${requestData.yearsExperience} años` || '-'}
+            {requestData.workAddress ? (
+              `${`${requestData.workAddress.street}, 
+              ${requestData.workAddress.number}`}, 
+              ${requestData.workAddress.comuna}, 
+              ${requestData.workAddress.city}`) : null || '-'}
           </Typography>
+
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Requiere computador:</Box>
             {' '}
@@ -182,6 +226,8 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
                   values.question_3,
                   values.question_4,
                   values.question_5].slice(0, questionQuantity),
+                SLA_Start: values.SLA_1?.valueOf(),
+                SLA_End: values.SLA_2?.valueOf(),
               },
               refetchQueries: [
                 { query: RECRUITMENT_PROCESS_INDEX_QUERY as DocumentNode },
@@ -210,13 +256,14 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
                 <InputLabel shrink className={classes.labelText} id="SLA_1-label">SLA inicio</InputLabel>
                 <MuiPickersUtilsProvider utils={DateFnsUtils} locale={esLocale}>
                   <KeyboardDatePicker
+                    disablePast
                     margin="normal"
                     id="SLA_1"
                     name="SLA_1"
                     cancelLabel="Cancelar"
                     format="dd/MM/yyyy"
                     value={values.SLA_1}
-                    onChange={(value) => setFieldValue('SLA_1', value)}
+                    onChange={(value) => { setFieldValue('SLA_1', value); setSLA1(value); }}
                     KeyboardButtonProps={{
                       'aria-label': 'cambiar fecha',
                     }}
@@ -235,13 +282,14 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
                 <InputLabel shrink className={classes.labelText} id="SLA_2-label">SLA fin</InputLabel>
                 <MuiPickersUtilsProvider utils={DateFnsUtils} locale={esLocale}>
                   <KeyboardDatePicker
+                    disablePast
                     margin="normal"
-                    id="SLA_1"
-                    name="SLA_1"
+                    id="SLA_2"
+                    name="SLA_2"
                     cancelLabel="Cancelar"
                     format="dd/MM/yyyy"
                     value={values.SLA_2}
-                    onChange={(value) => setFieldValue('SLA_2', value)}
+                    onChange={(value) => { setFieldValue('SLA_2', value); setSLA2(value); }}
                     onBlur={handleBlur}
                     KeyboardButtonProps={{
                       'aria-label': 'cambiar fecha',
@@ -265,7 +313,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
                 id="description"
                 name="description"
                 value={values.description}
-                onChange={handleChange}
+                onChange={(e) => { handleChange(e); setDescription(e.target.value); }}
                 onBlur={handleBlur}
                 inputProps={{ style: { fontSize: 'small' } }}
                 error={touched.description && Boolean(errors.description)}
@@ -281,18 +329,19 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
                 placeholder="Ingrese la primera pregunta para el postulante"
                 variant="outlined"
                 value={values.question_1}
-                onChange={handleChange}
+                onChange={(e) => { handleChange(e); setQuestion1(e.target.value); }}
                 inputProps={{ style: { fontSize: 'small' } }}
                 error={touched.question_1 && Boolean(errors.question_1)}
                 helperText={touched.question_1 ? errors.question_1 : ''}
                 FormHelperTextProps={{ className: classes.helperText }}
               />
 
-              {[values.question_1,
-                values.question_2,
-                values.question_3,
-                values.question_4,
-                values.question_5].slice(1, questionQuantity).map((handler, index) => (
+              {[{ val: values.question_1, stat: setQuestion1 },
+                { val: values.question_2, stat: setQuestion2 },
+                { val: values.question_3, stat: setQuestion3 },
+                { val: values.question_4, stat: setQuestion4 },
+                { val: values.question_5, stat: setQuestion5 }].slice(1, questionQuantity).map(
+                (handler, index) => (
                   <TextField
                     key={`question_${index + 2}`}
                     className={classes.questionField}
@@ -301,11 +350,12 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
                     name={`question_${index + 2}`}
                     placeholder={`Ingrese la ${index + 2}° pregunta para el postulante`}
                     variant="outlined"
-                    value={handler}
-                    onChange={handleChange}
+                    value={handler.val}
+                    onChange={(e) => { handleChange(e); handler.stat(e.target.value); }}
                     inputProps={{ style: { fontSize: 'small' } }}
                   />
-              ))}
+                ),
+              )}
               <div ref={scrollRef} style={{ display: 'grid', justifyContent: 'center', gridAutoFlow: 'column' }}>
 
                 <IconButton
@@ -387,8 +437,58 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
           >
             <SamplePostedApplicationCard
               jobOffer={requestData}
+              SLA_1={SLA_1}
             />
-
+            <div className={classes.queryDetails}>
+              <Typography variant="caption" component="div">
+                <Box fontWeight="fontWeightMedium" display="inline">Creación:</Box>
+                {' '}
+                {new Date(requestData.requestCreationDate).toLocaleDateString() || '-'}
+              </Typography>
+              <Typography variant="caption" component="div">
+                <Box fontWeight="fontWeightMedium" display="inline">Publicación:</Box>
+                {' '}
+                {new Date().toLocaleDateString() || '-'}
+              </Typography>
+              {SLA_1 ? (
+                <Typography variant="caption" component="div">
+                  <Box fontWeight="fontWeightMedium" display="inline">SLA Inicio:</Box>
+                  {' '}
+                  {SLA_1.toLocaleDateString() || '-'}
+                </Typography>
+              ) : null}
+              {SLA_2 ? (
+                <Typography variant="caption" component="div">
+                  <Box fontWeight="fontWeightMedium" display="inline">SLA Fin:</Box>
+                  {' '}
+                  {SLA_2.toLocaleDateString() || '-'}
+                </Typography>
+              ) : null}
+              {description !== '' ? (
+                <Typography variant="caption" component="div">
+                  <Box fontWeight="fontWeightMedium" display="inline">Descripción:</Box>
+                  {' '}
+                  {description || '-'}
+                </Typography>
+              ) : null}
+              {[
+                question1,
+                question2,
+                question3,
+                question4,
+                question5,
+              ].slice(0, questionQuantity).map((question, idx) => (
+                question !== '' ? (
+                  <Typography key={`question_${idx + 1}`} variant="caption" component="div">
+                    <Box fontWeight="fontWeightMedium" display="inline">
+                      {`Pregunta ${idx + 1}`}
+                      :
+                    </Box>
+                    {' '}
+                    {question || '-'}
+                  </Typography>
+                ) : null))}
+            </div>
           </div>
 
           <Button

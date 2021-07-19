@@ -16,35 +16,26 @@ import {
 import HomeIcon from '@material-ui/icons/Home';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import ViewQuiltIcon from '@material-ui/icons/ViewQuilt';
-import NotificationsIcon from '@material-ui/icons/Notifications';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuIcon from '@material-ui/icons/Menu';
 import { useTheme } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useKeycloak } from '@react-keycloak/ssr';
-import type { KeycloakInstance, KeycloakTokenParsed } from 'keycloak-js';
+import type { KeycloakInstance } from 'keycloak-js';
+
 import drawerStyles from './styles';
+import ParsedTokenType from '../types/keycloak-token-type';
 
 interface Props {
   children: JSX.Element,
-  window2: () => Window,
 }
-
-type ParsedToken = KeycloakTokenParsed & {
-  email?: string
-
-  preferred_username?: string
-
-  given_name?: string
-
-  family_name?: string
-};
 
 export default function ClippedDrawer(props: Props): JSX.Element {
   const { keycloak } = useKeycloak<KeycloakInstance>();
-  const parsedToken: ParsedToken | undefined = keycloak?.tokenParsed;
-  const { children, window2 } = props;
+  const parsedToken = keycloak?.tokenParsed as ParsedTokenType;
+  const { children } = props;
   const theme = useTheme();
   const classes = drawerStyles();
   const router = useRouter();
@@ -60,7 +51,6 @@ export default function ClippedDrawer(props: Props): JSX.Element {
       window.location.href = keycloak.createLogoutUrl({ redirectUri: window.location.origin });
     }
   };
-  const container = window2 !== undefined ? () => window2().document.body : undefined;
   const buttonsArray = [{
     key: 'incio',
     label: 'Inicio',
@@ -127,13 +117,14 @@ export default function ClippedDrawer(props: Props): JSX.Element {
           {keycloak?.authenticated || (keycloak && parsedToken) ? (
             <>
               <IconButton
+                className={classes.iconStyle}
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
                 color="inherit"
-                className={classes.iconStyle}
+                onClick={() => router.push('/professional-profile')}
               >
-                <NotificationsIcon />
+                <AccountCircle />
               </IconButton>
               <Hidden lgUp>
                 <IconButton
@@ -158,7 +149,6 @@ export default function ClippedDrawer(props: Props): JSX.Element {
       </AppBar>
       <Hidden lgUp>
         <Drawer
-          container={container}
           variant="temporary"
           anchor={theme.direction === 'rtl' ? 'right' : 'left'}
           open={mobileOpen}

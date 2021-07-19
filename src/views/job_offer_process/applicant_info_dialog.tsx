@@ -22,7 +22,6 @@ interface NewRequestDialogProps {
   openDialog: boolean,
   handleCloseDialog: ()=> void,
   dialogTitle: string,
-  dialogContentID: string,
   applicationInfo: FilterApplicationsType,
   professionalInfo: GetProfessionalType,
   step: string,
@@ -33,7 +32,6 @@ export default function NewRequestDialog(props:NewRequestDialogProps) : JSX.Elem
     openDialog,
     handleCloseDialog,
     dialogTitle,
-    dialogContentID,
     applicationInfo,
     professionalInfo,
     step,
@@ -57,12 +55,13 @@ export default function NewRequestDialog(props:NewRequestDialogProps) : JSX.Elem
         <Typography variant="body1" component="div" style={{ textAlign: 'center' }}>
           <Box fontWeight="fontWeightMedium" display="inline">{`ETAPA: ${step}`}</Box>
         </Typography>
+        <Typography variant="body1" component="div" style={{ textAlign: 'center' }}>{applicationInfo.rejectedMessage !== '' ? `Rechazado por: ${applicationInfo.rejectedMessage}` : ''}</Typography>
       </DialogTitle>
       <DialogContent className={classes.DialogContent}>
         <Grid
           container
           direction="row"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
         >
           <Grid item xs={12} sm={6} style={{ textAlign: 'center' }}>
@@ -96,28 +95,31 @@ export default function NewRequestDialog(props:NewRequestDialogProps) : JSX.Elem
           openRejectionDialog={openRejectionDialog}
           handleCloseParentDialog={handleCloseDialog}
           handleCloseRejectionDialog={handleCloseRejectionDialog}
-          dialogContentID={dialogContentID}
           applicationInfo={applicationInfo}
         />
         <ApprovalDialog
           openApprovalDialog={openApprovalDialog}
           handleCloseParentDialog={handleCloseDialog}
           handleCloseApprovalDialog={handleCloseApprovalDialog}
-          dialogContentID={dialogContentID}
           applicationInfo={applicationInfo}
         />
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleOpenRejectDialog} style={{ color: 'red' }}>
-          Rechazar
-        </Button>
+        {(applicationInfo.status === 'IN_PROCESS' && applicationInfo.stage === 'JOB_OFFER') || applicationInfo.status === 'REJECTED' ? null
+          : (
+            <Button onClick={handleOpenRejectDialog} style={{ color: 'red' }}>
+              Rechazar
+            </Button>
+          )}
         <Button onClick={handleCloseDialog} color="primary">
           Cerrar
         </Button>
-        <Button onClick={handleOpenApprovalDialog} variant="contained" color="secondary">
-          Pasar a siguiente fase
-        </Button>
+        {applicationInfo.status === 'REJECTED' || applicationInfo.status === 'ACCEPTED' ? null : (
+          <Button onClick={handleOpenApprovalDialog} variant="contained" color="secondary">
+            {(applicationInfo.status === 'IN_PROCESS' && applicationInfo.stage === 'JOB_OFFER') ? 'Convertir en candidato' : 'Pasar a siguiente fase'}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

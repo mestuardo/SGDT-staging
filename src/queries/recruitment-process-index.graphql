@@ -2,6 +2,7 @@ query {
   requests: requests {
     id
     position
+    requestCreationDate
     vacancies
     client
     recruiter
@@ -9,9 +10,25 @@ query {
   jobOffers: jobOffers {
     id
     position
+    requestCreationDate
+    jobOfferCreationDate
+    sla_start
+    sla_end
     vacancies
     client
     recruiter
-    # TODO: add SLAs
+  }
+  getClosedJobOffers: getClosedJobOffers {
+    id
+    position
+    requestCreationDate
+    jobOfferCreationDate
+    closeMessage
+    closeJobOfferDate
+    sla_start
+    sla_end
+    vacancies
+    client
+    recruiter
   }
 }

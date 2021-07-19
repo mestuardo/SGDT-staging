@@ -1,28 +1,15 @@
 import React from 'react';
 
 import { useKeycloak } from '@react-keycloak/ssr';
-
-import type { KeycloakInstance, KeycloakTokenParsed } from 'keycloak-js';
-
+import type { KeycloakInstance } from 'keycloak-js';
 import { useRouter } from 'next/router';
 import { useQuery } from '@apollo/client';
 
+import ParsedTokenType from '../../src/types/keycloak-token-type';
+import { JobOfferDetailType } from '../../src/types/job-offer-query-types';
+import JOB_OFFER_DETAILS from '../../src/queries/job-offer-details.graphql';
 import LoginWaitingRoom from '../../src/login_waiting_room';
 import PostedAppDetail from '../../src/views/posted_app_card_details';
-
-import JOB_OFFER_DETAILS from '../../src/queries/job-offer-details.graphql';
-
-import { JobOfferDetailType } from '../../src/types/job-offer-query-types';
-
-type ParsedToken = KeycloakTokenParsed & {
-  email?: string
-
-  preferred_username?: string
-
-  given_name?: string
-
-  family_name?: string
-};
 
 interface JobOfferQueryData {
   jobOffer: JobOfferDetailType,
@@ -31,7 +18,7 @@ interface JobOfferQueryData {
 export default function Index():JSX.Element {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   // The token received by keycloak with the data
-  const parsedToken: ParsedToken | undefined = keycloak?.tokenParsed;
+  const parsedToken = keycloak?.tokenParsed as ParsedTokenType;
 
   const router = useRouter();
   const { reqId } = router.query;

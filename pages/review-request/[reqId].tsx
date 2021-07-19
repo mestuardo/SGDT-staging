@@ -1,22 +1,17 @@
 import React from 'react';
 import { useKeycloak } from '@react-keycloak/ssr';
-import type { KeycloakInstance, KeycloakTokenParsed } from 'keycloak-js';
+import type { KeycloakInstance } from 'keycloak-js';
 import { useRouter } from 'next/router';
 import {
   useQuery,
 } from '@apollo/client';
+
+import ParsedTokenType from '../../src/types/keycloak-token-type';
 import { RequestDetailType } from '../../src/types/request-query-types';
 import REQUEST_DETAILS from '../../src/queries/request-details.graphql';
-
 import LoginWaitingRoom from '../../src/login_waiting_room';
 import RequestReviewDetail from '../../src/views/request_review_detail';
 
-type ParsedToken = KeycloakTokenParsed & {
-  email?: string
-  preferred_username?: string
-  given_name?: string
-  family_name?: string
-};
 interface RequestData {
   request: RequestDetailType,
 }
@@ -24,7 +19,7 @@ interface RequestData {
 export default function Index(): JSX.Element {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   // The token received by keycloak with the data
-  const parsedToken: ParsedToken | undefined = keycloak?.tokenParsed;
+  const parsedToken = keycloak?.tokenParsed as ParsedTokenType;
   const router = useRouter();
   const { reqId } = router.query;
 

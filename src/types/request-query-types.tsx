@@ -1,6 +1,11 @@
 export interface RequestSummaryType {
   id: string,
   position: string,
+  requestCreationDate: number,
+  jobOfferCreationDate: number,
+  closeJobOfferDate: number,
+  sla_start: number,
+  sla_end: number,
   vacancies: number,
   client: string,
   recruiter: string,
@@ -13,7 +18,13 @@ export interface RequestsIdsType {
 export interface RequestDetailType {
   id: string,
   client: string,
-  contractType:string,
+  contractType: number[],
+  requestCreationDate: number,
+  jobOfferCreationDate: number,
+  closeJobOfferDate: number,
+  closeMessage: string,
+  sla_start: number,
+  sla_end: number,
   position: string,
   vacancies: number,
   approxStartDate: string,
@@ -28,6 +39,14 @@ export interface RequestDetailType {
   serviceType: string,
   yearsExperience: number,
   shiftType:string,
-  requiresComputer:boolean
-
+  requiresComputer: boolean
+  specialRequirements: string[],
+  technicalRequirements: { requirement: string, obligatoriness: string }[],
+  workAddress: {
+    city: string,
+    number: string,
+    comuna: string,
+    country: string,
+    street: string,
+  }
 }

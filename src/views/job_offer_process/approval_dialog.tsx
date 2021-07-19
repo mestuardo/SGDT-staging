@@ -7,7 +7,7 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
-  TextField,
+  Typography,
 } from '@material-ui/core';
 
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -23,7 +23,6 @@ interface NewRequestDialogProps {
   openApprovalDialog: boolean,
   handleCloseParentDialog: () => void,
   handleCloseApprovalDialog: ()=> void,
-  dialogContentID: string,
   applicationInfo: FilterApplicationsType
 }
 
@@ -32,12 +31,10 @@ export default function RejectionDialog(props:NewRequestDialogProps) : JSX.Eleme
     openApprovalDialog,
     handleCloseParentDialog,
     handleCloseApprovalDialog,
-    dialogContentID,
     applicationInfo,
   } = props;
   const classes = changeStageDialogStyles();
 
-  const [msg, setMsg] = React.useState<string>('Estimado postulante, usted pasará a la siguiente etapa de esta postulación.');
   const [nextStage,
     { loading: nextStageMutLoading, error: nextStageMutError }] = useMutation(APPLICATION_STAGE);
   const [nextStatus,
@@ -64,6 +61,22 @@ export default function RejectionDialog(props:NewRequestDialogProps) : JSX.Eleme
         variables: {
           changeApplicationStageApplicationId: applicationInfo.id,
           changeApplicationStageStage: 'PSYCHOLOGICAL',
+          changeApplicationStageMessage: '',
+        },
+        refetchQueries: [{
+          query: FILTER_APPLICATIONS as DocumentNode,
+          variables: { jobOfferId: applicationInfo.jobOfferId },
+        }],
+      }).then(() => {
+        handleCloseApprovalDialog();
+        handleCloseParentDialog();
+      }).catch((mutErr) => { throw (mutErr); });
+    }
+    if (applicationInfo.stage === 'PRE_INTERVIEW') {
+      return nextStage({
+        variables: {
+          changeApplicationStageApplicationId: applicationInfo.id,
+          changeApplicationStageStage: 'TECHNICAL',
         },
         refetchQueries: [{
           query: FILTER_APPLICATIONS as DocumentNode,
@@ -77,7 +90,7 @@ export default function RejectionDialog(props:NewRequestDialogProps) : JSX.Eleme
     return nextStage({
       variables: {
         changeApplicationStageApplicationId: applicationInfo.id,
-        changeApplicationStageStage: 'TECHNICAL',
+        changeApplicationStageStage: 'PRE_INTERVIEW',
       },
       refetchQueries: [{
         query: FILTER_APPLICATIONS as DocumentNode,
@@ -96,28 +109,17 @@ export default function RejectionDialog(props:NewRequestDialogProps) : JSX.Eleme
       aria-labelledby="applicant-info-details"
     >
       <DialogTitle id="applicant-info-details" style={{ textAlign: 'center' }}>
-        Mensaje avance de etapa postulación
+        Avance de etapa postulación
 
       </DialogTitle>
       <DialogContent className={classes.DialogContent}>
         <Grid
           container
           direction="column"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
         >
-          {dialogContentID}
-          <TextField
-            label="Escriba un mensaje..."
-            style={{ width: '90%' }}
-            margin="normal"
-            multiline
-            value={msg}
-            onChange={(e) => setMsg(e.target.value)}
-            rows={4}
-            variant="outlined"
-            inputProps={{ style: { fontSize: 'small' } }}
-          />
+          <Typography variant="body1" style={{ width: '90%' }}>¿Está seguro de avanzar al profesional de etapa?</Typography>
         </Grid>
 
       </DialogContent>

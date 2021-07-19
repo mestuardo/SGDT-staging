@@ -2,7 +2,6 @@ export interface CreateRequestType {
   approxStartDate: Date,
   client: string,
   contractType: string,
-  externalRep: string,
   formationStatus: string,
   internalRep:string,
   levelOfStudies: string,

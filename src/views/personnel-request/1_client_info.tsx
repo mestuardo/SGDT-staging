@@ -34,6 +34,10 @@ const ValidationSchema = Yup.object().shape({
     .required('Ingrese al reclutador'),
   maxSalary: Yup.string()
     .required('Ingrese la renta máxima para contratación'),
+  levelOfStudies: Yup.string()
+    .required('Ingrese la formación académica'),
+  formationStatus: Yup.string()
+    .required('Ingrese el nivel de la formación'),
 
 });
 
@@ -63,17 +67,8 @@ export default function ClientInfo(props: ClientInfoProps) : JSX.Element {
         initialValues={formSchema}
         validationSchema={ValidationSchema}
         onSubmit={(values) => {
-          formSchema.position = values.position;
-          formSchema.vacancies = values.vacancies;
-          formSchema.yearsExperience = values.yearsExperience;
-          formSchema.client = values.client;
-          formSchema.recruiter = values.recruiter;
-          formSchema.externalRep = values.externalRep;
-          formSchema.maxSalary = values.maxSalary;
-          formSchema.levelOfStudies = values.levelOfStudies;
-          formSchema.formationStatus = values.formationStatus;
-          handleNext();
           updatePreviewCardContent(values);
+          handleNext();
         }}
       >
         {({
@@ -166,10 +161,10 @@ export default function ClientInfo(props: ClientInfoProps) : JSX.Element {
                 onBlur={handleBlur}
                 inputProps={{ className: classes.inputText }}
               >
-                <MenuItem value="BASICA">Educación Básica</MenuItem>
-                <MenuItem value="MEDIA">Educación Media</MenuItem>
-                <MenuItem value="TECNICO">Formación Técnico-Profesional</MenuItem>
-                <MenuItem value="UNIVERSITARIA">Educación Universitaria</MenuItem>
+                <MenuItem value="LOWER_SCHOOL">Educación Básica</MenuItem>
+                <MenuItem value="HIGH_SCHOOL">Educación Media</MenuItem>
+                <MenuItem value="TECHNICAL">Formación Técnico-Profesional</MenuItem>
+                <MenuItem value="COLLEGE">Educación Universitaria</MenuItem>
               </Select>
               <FormHelperText className={classes.helperText}>{touched.levelOfStudies ? errors.levelOfStudies : ''}</FormHelperText>
             </FormControl>
@@ -189,8 +184,9 @@ export default function ClientInfo(props: ClientInfoProps) : JSX.Element {
                 onBlur={handleBlur}
                 inputProps={{ className: classes.inputText }}
               >
-                <MenuItem value="COMPLETO">Completa</MenuItem>
-                <MenuItem value="INCOMPLETO">Incompleta</MenuItem>
+                <MenuItem value="TITLED">Titulado</MenuItem>
+                <MenuItem value="GRADUATED">Graduado</MenuItem>
+                <MenuItem value="SUSPENDED">Congelado</MenuItem>
               </Select>
               <FormHelperText className={classes.helperText}>{touched.formationStatus ? errors.formationStatus : ''}</FormHelperText>
             </FormControl>

@@ -26,23 +26,8 @@ import HiringInfo from './4_hiring_info';
 import Summary from './5_Summary';
 
 const summaryLabels: { [key:string]:string | boolean } = {
-  BASICA: 'LOWER_SCHOOL',
-  MEDIA: 'HIGH_SCHOOL',
-  TECNICO: 'TECHNICAL',
-  UNIVERSITARIA: 'COLLEGE',
-  COMPLETO: 'COMPLETE',
-  INCOMPLETO: 'INCOMPLETE',
-  FIJO: 'FIXED',
-  INDEFINIDO: 'INDEFINITE',
-  PART_TIME: 'PART_TIME',
-  FULL_TIME: 'FULL_TIME',
-  FREELANCER: 'FREELANCE',
   SI: true,
   NO: false,
-  INTERNO: 'INTERNAL',
-  OUTSOURCING: 'OUTSOURCING',
-  TRANSITORIOS: 'OUTSOURCING_TRANSITORY',
-  SELECCION: 'OUTSOURCING_SELECTION',
 };
 
 const steps = ['Información del cliente',
@@ -79,15 +64,29 @@ export default function SignIn(props: FormProps): JSX.Element {
       return <CircularProgress color="primary" />;
     }
     if (mutationError) {
+      // if (mutationError) return <div>{JSON.stringify(mutationError, null, 2)}</div>;
       return <p>Error. Por favor intente de nuevo</p>;
     }
     return (
       <>
         <p>Solicitud enviada</p>
-        <Button variant="contained" href="/recruitment-process" className={classes.button}> Volver a solicitudes</Button>
+        <Button variant="contained" href="/recruitment-process" className={classes.button}> Ir a procesos activos</Button>
         <Button variant="contained" href="/personnel-request" className={classes.button}> Crear nueva solicitud</Button>
       </>
     );
+  };
+  const getContracts = () => {
+    if (formSchema.contractType_1 === 'INDEFINITE') {
+      return [-1];
+    } if (formSchema.contractType_1 === 'FIXED' && formSchema.contractType_2 === 'INDEFINITE') {
+      return [formSchema.possibleDuration_1, -1];
+    } if (formSchema.contractType_1 === 'FIXED'
+      && formSchema.contractType_2 === 'FIXED'
+      && formSchema.contractType_3 === 'INDEFINITE') {
+      return [formSchema.possibleDuration_1, formSchema.possibleDuration_2, -1];
+    }
+    return [formSchema.possibleDuration_1,
+      formSchema.possibleDuration_2, formSchema.possibleDuration_3];
   };
 
   const handleSubmit = () => {
@@ -99,29 +98,35 @@ export default function SignIn(props: FormProps): JSX.Element {
           createRequestInput: {
             approxStartDate: formSchema.approxStartDate,
             client: formSchema.client,
-            contractType: summaryLabels[formSchema.contractType],
-            externalRep: formSchema.externalRep,
-            formationStatus: summaryLabels[formSchema.formationStatus],
+            contractType: getContracts(),
+            formationStatus: formSchema.formationStatus,
             internalRep: '609b4b9c4cfb419054fe7955', // TODO: change for real internal rep
-            levelOfStudies: summaryLabels[formSchema.levelOfStudies],
+            levelOfStudies: formSchema.levelOfStudies,
+            // TODO: change for real types
             languages: formSchema.languages.map(
               (lang:{ id: string; label: string; language: string; level: string; }) => (
-                { language: lang.language, level: lang.level }
+                { language: lang.language, level: lang.level, type: 'WRITING' }
               ),
             ),
             maxSalary: +formSchema.maxSalary,
             position: formSchema.position,
-            possibleDuration: parseFloat(formSchema.possibleDuration),
+            // possibleDuration: parseFloat(formSchema.possibleDuration),
             recruiter: formSchema.recruiter, // TODO: change for real recruiter
             requestDescription: formSchema.requestDescription,
             requiresComputer: summaryLabels[formSchema.requiresComputer],
-            serviceType: summaryLabels[formSchema.serviceType],
-            shiftType: summaryLabels[formSchema.shiftType],
+            serviceType: formSchema.serviceType,
+            shiftType: formSchema.shiftType,
             softSkills: formSchema.softSkills.split(','),
             specialRequirements: formSchema.specialRequirements.split(','),
-            technicalRequirements: formSchema.technicalRequirements.split(','),
+            technicalRequirements: formSchema.technicalRequirements,
             vacancies: +formSchema.vacancies,
-            // workAdress: '', // TODO: should have format city,commune,street,number
+            workAddress: {
+              city: formSchema.workAdress_city,
+              comuna: formSchema.workAdress_district,
+              country: 'Chile',
+              number: formSchema.workAdress_number,
+              street: formSchema.workAdress_street,
+            },
             yearsExperience: +formSchema.vacancies,
           },
         },
@@ -206,7 +211,7 @@ export default function SignIn(props: FormProps): JSX.Element {
       className={classes.root}
       container
       direction="column"
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       spacing={0}
     >

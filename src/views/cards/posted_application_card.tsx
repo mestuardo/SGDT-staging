@@ -54,14 +54,14 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
   const handleSave = () => {
     saveOffer({
       variables: {
-        saveJobOfferProfessionalId: '60e7cb10b2879c001142d330',
+        saveJobOfferProfessionalId: '60ec604347a1c50003285e75',
         saveJobOfferJobOfferId: jobOffer.id.toString(),
       },
     }).then(() => {
       if (mutationError) throw (mutationError);
       onSaveSuccess();
     }).catch((otherError) => {
-      console.log(otherError);
+      throw (otherError);
     });
   };
 
@@ -81,6 +81,30 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
     }
     return 'default';
   };
+  const getSLADaysLeft = () => {
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+    // a and b are javascript Date objects
+    function dateDiffInDays(a: Date, b: Date) {
+      // Discard the time and time-zone information.
+      const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+      const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+      return Math.floor((utc2 - utc1) / MS_PER_DAY);
+    }
+    if (jobOffer.closeMessage) {
+      return 'CLOSED';
+    }
+
+    const SLAdaysLeft = dateDiffInDays(new Date(), new Date(jobOffer.sla_start));
+    if ((SLAdaysLeft <= 15) && (SLAdaysLeft > 5)) {
+      return 'MID';
+    }
+    if (SLAdaysLeft > 15) {
+      return 'FAR';
+    }
+    return 'CLOSE';
+  };
 
   return (
     <Card className={classes.root}>
@@ -88,10 +112,18 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
         className={classes.cardHeader}
         avatar={(
           <Badge
+            classes={{
+              badge: classes.badgeDefault,
+              colorPrimary: classes.badgeAccepted,
+              colorSecondary: classes.badgePsy,
+              colorError: classes.badgeTech,
+            }}
             color={(applicationsData && setBadgeColor(applicationsData.jobOfferApplications)) || 'default'}
-            badgeContent={(!hideBadge && applicationsData) ? applicationsData.jobOfferApplications.filter((application) => application.status !== 'REJECTED').length : 0}
+            badgeContent={(!hideBadge && applicationsData)
+              ? applicationsData.jobOfferApplications.filter((application) => application.status !== 'REJECTED'
+                && application.stage !== 'JOB_OFFER').length : 0}
           >
-            <Avatar aria-label="status" className={classes.avatar} style={{ backgroundColor: statusColor('JOB_OFFER') }}>
+            <Avatar aria-label="status" className={classes.avatar} style={{ backgroundColor: statusColor(getSLADaysLeft()) }}>
               <AssignmentIcon className={classes.icon} />
             </Avatar>
           </Badge>
@@ -107,28 +139,32 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
         <Typography variant="caption" component="div">
           <Box fontWeight="fontWeightMedium" display="inline">Cliente:</Box>
           {' '}
-          {/* {request.client} */}
-          {/* TODO: agregar el cliente cuando pase de ser ID a texto */}
-          Cliente de ejemplo
+          {jobOffer.client}
         </Typography>
         <Typography variant="caption" component="div">
           <Box fontWeight="fontWeightMedium" display="inline">Reclutador:</Box>
           {' '}
-          {/* {request.recruiter} */}
-          {/* TODO: agregar el reclutador cuando pase de ser ID a texto */}
-          Juan Perez
+          {jobOffer.recruiter}
         </Typography>
-        <Typography variant="caption" component="div">
-          <Box fontWeight="fontWeightMedium" display="inline">SLA:</Box>
-          {' '}
-          3 a 5 días
-          {/* TODO: add SLAs */}
-        </Typography>
+        {jobOffer.closeMessage ? null : (
+          <Typography variant="caption" component="div">
+            <Box fontWeight="fontWeightMedium" display="inline">SLA Inicio:</Box>
+            {' '}
+            {new Date(jobOffer.sla_start).toLocaleDateString()}
+          </Typography>
+        ) }
         <Typography variant="caption" component="div">
           <Box fontWeight="fontWeightMedium" display="inline">Vacantes:</Box>
           {' '}
           {jobOffer.vacancies}
         </Typography>
+        {jobOffer.closeMessage ? (
+          <Typography variant="caption" component="div">
+            <Box fontWeight="fontWeightMedium" display="inline">Fecha cierre:</Box>
+            {' '}
+            {new Date(jobOffer.closeJobOfferDate).toLocaleDateString()}
+          </Typography>
+        ) : null }
       </CardContent>
       {!hideSaveButton && (
         <CardActions>
