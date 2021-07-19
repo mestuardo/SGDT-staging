@@ -79,14 +79,14 @@ export default function SignIn(props: FormProps): JSX.Element {
     if (formSchema.contractType_1 === 'INDEFINITE') {
       return [-1];
     } if (formSchema.contractType_1 === 'FIXED' && formSchema.contractType_2 === 'INDEFINITE') {
-      return [formSchema.possibleDuration_1, -1];
+      return [+formSchema.possibleDuration_1, -1];
     } if (formSchema.contractType_1 === 'FIXED'
       && formSchema.contractType_2 === 'FIXED'
       && formSchema.contractType_3 === 'INDEFINITE') {
-      return [formSchema.possibleDuration_1, formSchema.possibleDuration_2, -1];
+      return [+formSchema.possibleDuration_1, +formSchema.possibleDuration_2, -1];
     }
-    return [formSchema.possibleDuration_1,
-      formSchema.possibleDuration_2, formSchema.possibleDuration_3];
+    return [+formSchema.possibleDuration_1,
+      +formSchema.possibleDuration_2, +formSchema.possibleDuration_3];
   };
 
   const handleSubmit = () => {
