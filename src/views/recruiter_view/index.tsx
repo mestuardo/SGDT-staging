@@ -75,10 +75,6 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
             key={jobOffer.id}
             jobOffer={jobOffer}
             handleOpenDetails={handleOpenDetails}
-            onSaveSuccess={() => { }}
-            hideSaveButton
-            isSaved={false}
-            hideBadge={false}
           />
         </GridListTile>
       )) : <div>No hay resultados para esta búsqueda</div>}

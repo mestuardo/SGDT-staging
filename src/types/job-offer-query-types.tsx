@@ -68,3 +68,63 @@ export interface ClientInformationType {
     email: string,
   },
 }
+
+export type WeeklyShift = {
+  monday: string,
+  tuesday: string,
+  wednesday: string,
+  thursday: string,
+  friday: string,
+  saturday: string,
+  sunday: string,
+};
+
+export type Language = {
+  language: string,
+  level: string,
+  type: string
+};
+
+export type TechnicalRequirement = {
+  requirement: string,
+  obligatoriness: string
+};
+
+type Address = {
+  city: string,
+  comuna: string,
+  number: string,
+  street: string,
+};
+
+export interface ProfessionalJobOfferDetail {
+  approxStartDate?: Date;
+  contractType?: 'FIXED' | 'INDEFINITE';
+  formationStatus?: 'COMPLETE' | 'INCOMPLETE';
+  id: string,
+  languages?: Array<Language>;
+  levelOfStudies?: 'LOWER_SCHOOL' | 'HIGH_SCHOOL' | 'TECHNICAL' | 'COLLEGE';
+  maxSalary?: number;
+  offerDescription?: string,
+  position: string,
+  possibleDuration?: number;
+  recruiter?: number;
+  questions?: Array<string>,
+  requiresComputer?: boolean;
+  requiresPsychological?: boolean;
+  requiresReferral?: boolean;
+  requiresTechnical?: boolean;
+  serviceType?: 'INTERNAL' | 'OUTSOURCING' | 'OUTSOURCING_SELECTION' | 'OUTSOURCING_TRANSITORY';
+  shift?: WeeklyShift,
+  shiftType?: 'PART_TIME' | 'FULL_TIME' | 'FREELANCE',
+  softSkills?: Array<string>,
+  specialRequirements?: Array<string>,
+  stage: 'REQUEST' | 'JOB_OFFER' | 'PSYCHOLOGICAL' | 'TECHNICAL',
+  status: 'ACCEPTED' | 'IN_PROCESS' | 'REJECTED',
+  technicalRequirements?: Array<TechnicalRequirement>,
+  vacancies: number;
+  workAddress?: Address,
+  yearsExperience?: number;
+  saved?: false | boolean,
+  jobModality: string,
+}

@@ -1,6 +1,6 @@
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 
-const OffersListViewStyles = makeStyles((theme) => ({
+export const OffersListViewStyles = makeStyles((theme) => ({
   gridContainer: {
     marginTop: theme.spacing(8),
     marginBottom: theme.spacing(0),
@@ -22,4 +22,16 @@ const OffersListViewStyles = makeStyles((theme) => ({
   },
 }));
 
-export default OffersListViewStyles;
+export const ApplyOfferDialogStyles = makeStyles((theme) => ({
+  mainMetadataContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    borderRadius: 5,
+    backgroundColor: '#ecf0f1',
+    padding: 10,
+  },
+  content: {
+    overflow: 'scroll',
+  },
+}));

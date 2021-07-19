@@ -4,10 +4,11 @@ import { CircularProgress, GridList, GridListTile } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import withWidth from '@material-ui/core/withWidth';
 import APPLIED_JOB_OFFERS_OBJECTS from '../../queries/applied-job-offers-objects.graphql';
-import PostedApplicationCard from '../cards/posted_application_card';
+import OfferCard from '../cards/offer_card';
 import recruiterViewStyles from '../recruiter_view/styles';
 import getCols from '../../helpers/get_columns_helper';
-import { JobOfferSummaryType } from '../../types/job-offer-query-types';
+import { ProfessionalJobOfferDetail } from '../../types/job-offer-query-types';
+import professionalId from '../../global-variables';
 
 interface AppliedOffersListProps {
   width: Breakpoint,
@@ -15,17 +16,17 @@ interface AppliedOffersListProps {
 
 function AppliedOffersList(props: AppliedOffersListProps) {
   const { width } = props;
-  const [offers, setOffers] = React.useState<JobOfferSummaryType[]>([]);
+  const [offers, setOffers] = React.useState<ProfessionalJobOfferDetail[]>([]);
 
   interface AppliedOffersDataType {
-    getAppliedJobOffers: JobOfferSummaryType[],
+    getAppliedJobOffers: ProfessionalJobOfferDetail[],
   }
 
   const {
     loading, data,
   } = useQuery<AppliedOffersDataType>(APPLIED_JOB_OFFERS_OBJECTS, {
     notifyOnNetworkStatusChange: true,
-    variables: { getAppliedJobOffersProfessionalId: '60ec604347a1c50003285e75' },
+    variables: { getAppliedJobOffersProfessionalId: professionalId },
   });
   const classes = recruiterViewStyles();
 
@@ -45,14 +46,9 @@ function AppliedOffersList(props: AppliedOffersListProps) {
       <GridList className={classes.YgridList} cols={cols} cellHeight="auto" style={{ margin: 'auto' }}>
         {offers.map((jobOffer) => (
           <GridListTile key={jobOffer.id} className={classes.GridListTile}>
-            <PostedApplicationCard
+            <OfferCard
               key={jobOffer.id}
               jobOffer={jobOffer}
-              handleOpenDetails={() => {}}
-              onSaveSuccess={() => {}}
-              hideBadge
-              hideSaveButton
-              isSaved={false}
             />
           </GridListTile>
         ))}

@@ -1,0 +1,5 @@
+mutation UnsaveJobOfferMutation($unsaveJobOfferProfessionalId: ID!, $unsaveJobOfferJobOfferId: ID!) {
+  unsaveJobOffer(professionalId: $unsaveJobOfferProfessionalId, jobOfferId: $unsaveJobOfferJobOfferId) {
+    name
+  }
+}

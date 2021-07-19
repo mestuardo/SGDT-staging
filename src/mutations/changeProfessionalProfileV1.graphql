@@ -8,5 +8,6 @@ mutation Mutation($editProfessionalProfessionalId: ID!, $editProfessionalInput: 
     education
     skills
     pastJobs
+    birthDay
   }
 }

@@ -1,10 +1,10 @@
 import React from 'react';
 import {
-  Grid, Paper, Tab, Tabs,
+  Grid, Paper, Tab, Tabs, Hidden
 } from '@material-ui/core';
 import TabPanel from '../tab_panel';
 import assignIdToTab from '../../helpers/assign_id_to_tab';
-import OffersListViewStyles from './styles';
+import { OffersListViewStyles } from './styles';
 import NewOffersList from './new_offers_list';
 import AppliedOffersList from './applied_offers_list';
 import SavedOffersList from './saved_offers_list';

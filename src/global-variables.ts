@@ -1,2 +1,2 @@
-const professionalId = '60f4d10bda0a5e0003ac3ee7';
+const professionalId = '60f4efb487e19300031aefcc';
 export default professionalId;

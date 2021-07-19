@@ -1,14 +1,19 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
-import { CircularProgress, GridList, GridListTile } from '@material-ui/core';
+import { useQuery, NetworkStatus } from '@apollo/client';
+import {
+  CircularProgress, GridList, GridListTile,
+} from '@material-ui/core';
 import withWidth from '@material-ui/core/withWidth';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import ALL_JOB_OFFERS_OBJECTS from '../../queries/all-job-offers-objects.graphql';
 import SAVED_JOB_OFFERS_IDS from '../../queries/saved-job-offers-ids.graphql';
-import PostedApplicationCard from '../cards/posted_application_card';
+import APPLIED_JOB_OFFERS_IDS from '../../queries/applied-job-offers-ids.graphql';
+import OfferCard from '../cards/offer_card';
 import recruiterViewStyles from '../recruiter_view/styles';
 import getCols from '../../helpers/get_columns_helper';
-import { JobOfferDetailType } from '../../types/job-offer-query-types';
+import { ProfessionalJobOfferDetail } from '../../types/job-offer-query-types';
+import ApplyOfferDialog from './apply_offer_dialog';
+import professionalId from '../../global-variables';
 
 interface NewOffersListProps {
   width: Breakpoint,
@@ -16,37 +21,73 @@ interface NewOffersListProps {
 
 function NewOffersList(props: NewOffersListProps) {
   const { width } = props;
-  const [offers, setOffers] = React.useState<JobOfferDetailType[]>([]);
+  const [offers, setOffers] = React.useState<ProfessionalJobOfferDetail[]>([]);
   const [savedOffersIds, setSavedOffersIds] = React.useState(new Set());
+  const [appliedOffersIds, setAppliedOffersIds] = React.useState(new Set());
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [selectedJobOffer, setSelectedJobOffer] = React.useState<(
+  ProfessionalJobOfferDetail | undefined
+  )>(
+    undefined,
+    );
 
   interface AllJobOffersDataType {
-    jobOffers: JobOfferDetailType[],
+    jobOffers: ProfessionalJobOfferDetail[],
   }
 
   const {
     loading: allJobOffersLoading,
-    error: allJobOffersError,
+    // error: allJobOffersError,
     data: allJobOffersData,
     refetch: allJobOffersRefetch,
-  } = useQuery<AllJobOffersDataType>(ALL_JOB_OFFERS_OBJECTS, { notifyOnNetworkStatusChange: true });
+    networkStatus: allJobOffersNetworkStatus,
+  } = useQuery<AllJobOffersDataType>(ALL_JOB_OFFERS_OBJECTS, {
+    notifyOnNetworkStatusChange: true,
+    // fetchPolicy: 'no-cache',
+  });
 
   interface SavedJobOffersDataType {
-    getSavedJobOffers: JobOfferDetailType[],
+    getSavedJobOffers: ProfessionalJobOfferDetail[],
+  }
+
+  interface AppliedJobOffersDataType {
+    getAppliedJobOffers: ProfessionalJobOfferDetail[],
   }
 
   const {
+    /*
     loading: savedJobOffersLoading,
     error: savedJobOffersError,
+    */
     data: savedJobOffersData,
     refetch: savedJobOffersRefetch,
   } = useQuery<SavedJobOffersDataType>(SAVED_JOB_OFFERS_IDS, {
     notifyOnNetworkStatusChange: true,
-    variables: { getSavedJobOffersProfessionalId: '60ec604347a1c50003285e75' },
+    // fetchPolicy: 'network-only',
+    variables: { getSavedJobOffersProfessionalId: professionalId },
+  });
+
+  const {
+    /*
+    loading: appliedJobOffersLoading,
+    error: appliedJobOffersError,
+    */
+    data: appliedJobOffersData,
+    refetch: appliedJobOffersRefetch,
+  } = useQuery<AppliedJobOffersDataType>(APPLIED_JOB_OFFERS_IDS, {
+    notifyOnNetworkStatusChange: true,
+    // fetchPolicy: 'network-only',
+    variables: { getAppliedJobOffersProfessionalId: professionalId },
   });
 
   const classes = recruiterViewStyles();
 
   const { cols } = getCols(width);
+
+  const handleOpenDialog = (jobOffer: ProfessionalJobOfferDetail) => {
+    setSelectedJobOffer(jobOffer);
+    setOpenDialog(true);
+  };
 
   const handleSaveSuccess = (offerId: string) => {
     const savedIdsCopy = new Set(savedOffersIds);
@@ -54,46 +95,91 @@ function NewOffersList(props: NewOffersListProps) {
     setSavedOffersIds(savedIdsCopy);
   };
 
+  const handleApplySuccess = (offerId: string) => {
+    const appliedIdsCopy = new Set(appliedOffersIds);
+    appliedIdsCopy.add(offerId);
+    setAppliedOffersIds(appliedIdsCopy);
+  };
+
+  /*
+  React.useEffect(() => {
+    if (savedJobOffersData && savedJobOffersData.getSavedJobOffers) {
+      const newSavedIds = new Set(
+        savedJobOffersData.getSavedJobOffers.map((jobOffer) => jobOffer.id),
+      );
+      setSavedOffersIds(newSavedIds);
+    }
+  }, [savedJobOffersData, savedOffersIds]);
+  */
+
   const refetchAll = () => {
+    console.log('Gonna refetch all');
     const jobOffersObjectsPromise = allJobOffersRefetch();
     const savedJobOffersIdsPromise = savedJobOffersRefetch();
-    Promise.all([jobOffersObjectsPromise, savedJobOffersIdsPromise]).then(() => {
+    const appliedSavedJobOffersIdsPromise = appliedJobOffersRefetch();
+    Promise.all([
+      jobOffersObjectsPromise, appliedSavedJobOffersIdsPromise, savedJobOffersIdsPromise,
+    ]).then(() => {
+      console.log('allJobOffersData', allJobOffersData);
+      console.log('appliedJobOffersData', appliedJobOffersData);
+      console.log('savedJobOffersData', savedJobOffersData);
       if (savedJobOffersData) {
         const newSavedIds = new Set(
           savedJobOffersData.getSavedJobOffers.map((jobOffer) => jobOffer.id),
         );
         setSavedOffersIds(newSavedIds);
       }
-      if (allJobOffersData) setOffers(allJobOffersData.jobOffers);
+      if (allJobOffersData) {
+        setOffers(allJobOffersData.jobOffers);
+      }
+      if (appliedJobOffersData) {
+        const newAppliedJobOffersIds = new Set(
+          appliedJobOffersData.getAppliedJobOffers.map(
+            (jobOffer: ProfessionalJobOfferDetail) => jobOffer.id,
+          ),
+        );
+        setAppliedOffersIds(newAppliedJobOffersIds);
+      }
     }).catch((error) => { throw (error); });
   };
 
   React.useEffect(() => {
     refetchAll();
   },
-  [allJobOffersData, savedJobOffersData]);
+  []);
+
+  const loadingOrRefetching = allJobOffersLoading
+    || allJobOffersNetworkStatus === NetworkStatus.refetch;
 
   return (
     <>
-      {allJobOffersLoading && <CircularProgress />}
-      {!allJobOffersLoading && !offers.length && (
+      {allJobOffersNetworkStatus === NetworkStatus.refetch && <p>Refetching</p>}
+      {loadingOrRefetching && <CircularProgress />}
+      {!loadingOrRefetching && !offers.length && (
         <p>No hay nuevas ofertas actualmente.</p>
       )}
       <GridList className={classes.YgridList} cols={cols} cellHeight="auto" style={{ margin: 'auto' }}>
-        {offers.map((jobOffer) => (
+        {offers.filter((jobOffer) => !appliedOffersIds.has(jobOffer.id)).map((jobOffer) => (
           <GridListTile key={jobOffer.id} className={classes.GridListTile}>
-            <PostedApplicationCard
+            <OfferCard
               key={jobOffer.id}
               jobOffer={jobOffer}
-              handleOpenDetails={() => { }}
-              hideSaveButton={false}
-              hideBadge
+              openDetails={() => handleOpenDialog(jobOffer)}
+              allowSave
               onSaveSuccess={() => handleSaveSuccess(jobOffer.id)}
               isSaved={savedOffersIds.has(jobOffer.id)}
             />
           </GridListTile>
         ))}
       </GridList>
+      {selectedJobOffer && (
+        <ApplyOfferDialog
+          openDialog={openDialog}
+          notifyApplied={() => handleApplySuccess(selectedJobOffer.id)}
+          closeDialog={() => setOpenDialog(false)}
+          jobOffer={selectedJobOffer}
+        />
+      )}
     </>
   );
 }

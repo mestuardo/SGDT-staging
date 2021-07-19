@@ -68,7 +68,7 @@ export interface ProfileData {
   specialty: string,
   institutions: string,
   technicalKnowledge: string,
-  birthDate: Date,
+  birthDay: Date,
   contactInfo: ContactInfo,
   yearsExperience: string,
   education: EducationProps[],

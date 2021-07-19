@@ -4,10 +4,11 @@ import { CircularProgress, GridList, GridListTile } from '@material-ui/core';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
 import withWidth from '@material-ui/core/withWidth';
 import SAVED_JOB_OFFERS_OBJECTS from '../../queries/saved-job-offers-objects.graphql';
-import PostedApplicationCard from '../cards/posted_application_card';
+import OfferCard from '../cards/offer_card';
 import recruiterViewStyles from '../recruiter_view/styles';
 import getCols from '../../helpers/get_columns_helper';
-import { JobOfferDetailType } from '../../types/job-offer-query-types';
+import { ProfessionalJobOfferDetail } from '../../types/job-offer-query-types';
+import professionalId from '../../global-variables';
 
 interface SavedOffersListProps {
   width: Breakpoint,
@@ -15,29 +16,35 @@ interface SavedOffersListProps {
 
 function SavedOffersList(props: SavedOffersListProps) {
   const { width } = props;
-  const [offers, setOffers] = React.useState<JobOfferDetailType[]>([]);
+  const [offers, setOffers] = React.useState<ProfessionalJobOfferDetail[]>([]);
 
   interface SavedOffersDataType {
-    getSavedJobOffers: JobOfferDetailType[],
+    getSavedJobOffers: ProfessionalJobOfferDetail[],
   }
 
   const {
     loading, data, refetch,
   } = useQuery<SavedOffersDataType>(SAVED_JOB_OFFERS_OBJECTS, {
     notifyOnNetworkStatusChange: true,
-    variables: { getSavedJobOffersProfessionalId: '60ec604347a1c50003285e75' },
+    variables: { getSavedJobOffersProfessionalId: professionalId },
   });
   const classes = recruiterViewStyles();
+
+  const fetchOffers = () => {
+    setOffers([]);
+    refetch().then(() => {
+      if (data && data.getSavedJobOffers) setOffers(data.getSavedJobOffers);
+    }).catch((error) => { throw (error); });
+  };
+
+  const handleUnsaveSuccess = (jobOfferId: string) => {
+    const offersCopy = offers.filter((jobOffer) => jobOffer.id !== jobOfferId);
+    setOffers(offersCopy);
+  };
 
   const { cols } = getCols(width);
 
   React.useEffect(() => {
-    const fetchOffers = () => {
-      setOffers([]);
-      refetch().then(() => {
-        if (data && data.getSavedJobOffers) setOffers(data.getSavedJobOffers);
-      }).catch((error) => { throw (error); });
-    };
     fetchOffers();
   },
   []);
@@ -51,14 +58,12 @@ function SavedOffersList(props: SavedOffersListProps) {
       <GridList className={classes.YgridList} cols={cols} cellHeight="auto" style={{ margin: 'auto' }}>
         {offers.map((jobOffer) => (
           <GridListTile key={jobOffer.id} className={classes.GridListTile}>
-            <PostedApplicationCard
+            <OfferCard
               key={jobOffer.id}
               jobOffer={jobOffer}
-              hideBadge
+              allowUnsave
               isSaved
-              handleOpenDetails={() => { }}
-              onSaveSuccess={() => { }}
-              hideSaveButton={false}
+              onUnsaveSuccess={() => handleUnsaveSuccess(jobOffer.id)}
             />
           </GridListTile>
         ))}

@@ -131,3 +131,15 @@ export const postedApplicationCardStyles = makeStyles((theme: Theme) => createSt
     backgroundColor: 'blue',
   },
 }));
+
+export const offerCardStyles = makeStyles((theme: Theme) => createStyles({
+  root: {
+    maxWidth: 230,
+    margin: theme.spacing(1),
+  },
+  content: {
+    height: 70,
+    overflow: 'hidden',
+    cursor: 'pointer',
+  },
+}));

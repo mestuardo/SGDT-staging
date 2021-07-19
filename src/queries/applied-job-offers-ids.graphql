@@ -1,0 +1,5 @@
+query getAppliedJobOffers($getAppliedJobOffersProfessionalId: ID!) {
+  getAppliedJobOffers(professionalId: $getAppliedJobOffersProfessionalId) {
+    id
+  }
+}

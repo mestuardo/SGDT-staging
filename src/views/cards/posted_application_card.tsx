@@ -2,18 +2,14 @@ import React from 'react';
 import {
   Avatar,
   Box,
-  Button,
   Card,
-  CircularProgress,
   CardContent,
   CardHeader,
-  CardActions,
   Typography,
   Badge,
 } from '@material-ui/core';
 import AssignmentIcon from '@material-ui/icons/Assignment';
-import { useQuery, useMutation } from '@apollo/client';
-import SAVE_JOB_OFFER from '../../mutations/saveJobOffer.graphql';
+import { useQuery } from '@apollo/client';
 
 import { postedApplicationCardStyles } from './styles';
 import { FilterApplicationDataType, FilterApplicationsType } from '../../types/filter-applications-query-types';
@@ -24,21 +20,10 @@ import statusColor from './helpers';
 interface JobOfferCardProps{
   jobOffer: JobOfferSummaryType,
   handleOpenDetails: (RequestId:string) => void,
-  hideBadge: boolean,
-  hideSaveButton: boolean,
-  onSaveSuccess: () => void,
-  isSaved: boolean,
 }
 
 export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Element {
-  const {
-    jobOffer,
-    handleOpenDetails,
-    onSaveSuccess,
-    hideBadge = false,
-    hideSaveButton = false,
-    isSaved = false,
-  } = props;
+  const { jobOffer, handleOpenDetails } = props;
   const classes = postedApplicationCardStyles();
 
   const { data: applicationsData } = useQuery<FilterApplicationDataType>(
@@ -47,23 +32,6 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
       fetchPolicy: 'network-only',
     },
   );
-
-  const [saveOffer,
-    { loading: mutationLoading, error: mutationError }] = useMutation(SAVE_JOB_OFFER);
-
-  const handleSave = () => {
-    saveOffer({
-      variables: {
-        saveJobOfferProfessionalId: '60ec604347a1c50003285e75',
-        saveJobOfferJobOfferId: jobOffer.id.toString(),
-      },
-    }).then(() => {
-      if (mutationError) throw (mutationError);
-      onSaveSuccess();
-    }).catch((otherError) => {
-      throw (otherError);
-    });
-  };
 
   const openDetails = () => {
     handleOpenDetails(jobOffer.id);
@@ -119,7 +87,7 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
               colorError: classes.badgeTech,
             }}
             color={(applicationsData && setBadgeColor(applicationsData.jobOfferApplications)) || 'default'}
-            badgeContent={(!hideBadge && applicationsData)
+            badgeContent={(applicationsData)
               ? applicationsData.jobOfferApplications.filter((application) => application.status !== 'REJECTED'
                 && application.stage !== 'JOB_OFFER').length : 0}
           >
@@ -166,13 +134,6 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
           </Typography>
         ) : null }
       </CardContent>
-      {!hideSaveButton && (
-        <CardActions>
-          <Button size="small" color="primary" onClick={handleSave} disabled={isSaved}>
-            {mutationLoading ? <CircularProgress size={15} /> : 'Guardar'}
-          </Button>
-        </CardActions>
-      )}
     </Card>
   );
 }

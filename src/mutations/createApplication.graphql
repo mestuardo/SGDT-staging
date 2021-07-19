@@ -1,0 +1,12 @@
+mutation CreateApplicationMutation($createApplicationInput: ApplicationInput) {
+  createApplication(input: $createApplicationInput) {
+    id
+    jobOfferId
+    professionalId
+    status
+    recruiterId
+    questions
+    answers
+    assessment
+  }
+}

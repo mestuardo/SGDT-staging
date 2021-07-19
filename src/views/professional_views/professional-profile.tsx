@@ -10,6 +10,16 @@ import {
 } from '@material-ui/core';
 import ControlPointOutlinedIcon from '@material-ui/icons/ControlPointOutlined';
 import CancelOutlinedIcon from '@material-ui/icons/CancelOutlined';
+import CakeOutlinedIcon from '@material-ui/icons/CakeOutlined';
+import HomeIcon from '@material-ui/icons/Home';
+import LanguageIcon from '@material-ui/icons/Language';
+import PhoneIcon from '@material-ui/icons/Phone';
+import EmailIcon from '@material-ui/icons/Email';
+import WorkIcon from '@material-ui/icons/Work';
+import StarIcon from '@material-ui/icons/Star';
+import AccountBoxIcon from '@material-ui/icons/AccountBox';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import ImportantDevicesIcon from '@material-ui/icons/ImportantDevices';
 import withWidth from '@material-ui/core/withWidth';
 
 import { ApolloError, useMutation } from '@apollo/client';
@@ -233,6 +243,7 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
         profile,
         institutions: institution,
         technicalKnowledge: techKnowledge,
+        birthDay: birthDate,
         contactInfo: {
           phone: contactInfo.phone,
           email: contactInfo.email,
@@ -366,7 +377,7 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
     setCurrentJob(props.data.currentJob ? props.data.currentJob : '');
     setSpecialty(props.data.specialty ? props.data.specialty : '');
     setInstitution(props.data.institutions ? props.data.institutions : '');
-    setBirthDate(props.data.birthDate ? props.data.birthDate : null);
+    setBirthDate(props.data.birthDay ? new Date(props.data.birthDay) : new Date());
     setContactInfo(props.data.contactInfo ? props.data.contactInfo : defaultContactInfo);
     setYearsExperience(props.data.yearsExperience ? props.data.yearsExperience : '');
     setTechKnowledge(props.data.technicalKnowledge ? props.data.technicalKnowledge : '');
@@ -419,60 +430,93 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
             {editFirst === false
               ? (
                 <div className={classes.leftBody}>
-                  <Typography style={{ display: 'flex', flexDirection: 'column', maxWidth: '80%' }} variant="body1" component="h2">
+                  <Typography style={{ display: 'flex', flexDirection: 'column', maxWidth: '100%' }} variant="body1" component="h2">
                     <Box pl={1} width="50%" fontWeight="fontWeightBold" fontSize={20}>
                       {name.length !== 0 ? name : 'No especificado'}
                       {' '}
                       {lastName.length !== 0 ? lastName : ''}
                     </Box>
-                    <Box pl={1} width="50%" fontWeight="fontWeightRegular" fontSize={15} marginBottom="5%">
-                      {birthDate ? `${birthDate.getDate()}-${birthDate.getMonth()}-${birthDate.getFullYear()}` : ''}
+                    <Box fontWeight="fontWeightBold" fontSize={13} marginTop="5%" display="flex">
+                      <CakeOutlinedIcon />
+                      <Box marginTop="1%" marginLeft="1%">Fecha de nacimiento:</Box>
                     </Box>
-                    <Box fontWeight="fontWeightBold" fontSize={13}>Dirección:</Box>
-                    <Box pl={1} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
+                    <Box pl={4} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
+                      {birthDate ? `${birthDate.toLocaleDateString()}` : 'No especificado'}
+                    </Box>
+                    <Box fontWeight="fontWeightBold" fontSize={13} display="flex">
+                      <HomeIcon />
+                      <Box marginTop="1%" marginLeft="1%">Dirección:</Box>
+                    </Box>
+                    <Box pl={4} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
                       {contactInfo.address.street.trim().length !== 0 ? `${contactInfo.address.street} ${contactInfo.address.number}, ${contactInfo.address.comuna}` : 'No especificado'}
                     </Box>
-                    <Box fontWeight="fontWeightBold" fontSize={13}>País:</Box>
-                    <Box pl={1} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
+                    <Box fontWeight="fontWeightBold" fontSize={13} display="flex">
+                      <LanguageIcon />
+                      <Box marginTop="1%" marginLeft="1%">País:</Box>
+                    </Box>
+                    <Box pl={4} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
                       {contactInfo.address.country.trim().length !== 0 ? contactInfo.address.country : 'No especificado'}
                     </Box>
-                    <Box fontWeight="fontWeightBold" fontSize={13}>Número Telefónico:</Box>
-                    <Box pl={1} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
+                    <Box fontWeight="fontWeightBold" fontSize={13} display="flex">
+                      <PhoneIcon />
+                      <Box marginTop="1%" marginLeft="1%">Número Telefónico:</Box>
+                    </Box>
+                    <Box pl={4} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
                       {contactInfo.phone.trim().length !== 0 ? contactInfo.phone : 'No especificado'}
                     </Box>
-                    <Box fontWeight="fontWeightBold" fontSize={13}>Correo electrónico:</Box>
-                    <Box pl={1} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
+                    <Box fontWeight="fontWeightBold" fontSize={13} display="flex">
+                      <EmailIcon />
+                      <Box marginTop="1%" marginLeft="1%">Correo electrónico:</Box>
+                    </Box>
+                    <Box pl={4} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
                       {contactInfo.email.trim().length !== 0 ? contactInfo.email : 'No especificado'}
                     </Box>
 
-                    <Box fontWeight="fontWeightBold" fontSize={13}>Años de experiencia laboral: </Box>
-                    <Box pl={1} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
+                    <Box fontWeight="fontWeightBold" fontSize={13} display="flex">
+                      <WorkIcon />
+                      <Box marginTop="1%" marginLeft="1%">Años de experiencia laboral:</Box>
+                      {' '}
+                    </Box>
+                    <Box pl={4} width="50%" fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%">
                       {yearsExperience.length !== 0 ? yearsExperience : 'No especificado'}
                     </Box>
-                    <Box fontWeight="fontWeightBold" fontSize={13}>
-                      Trabajo Actual:
+                    <Box fontWeight="fontWeightBold" fontSize={13} display="flex">
+                      <WorkIcon />
+                      <Box marginTop="1%" marginLeft="1%">Trabajo Actual:</Box>
                     </Box>
-                    <Box pl={1} fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%" width="90%">
+                    <Box pl={4} fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%" width="90%">
                       {currentJob.length !== 0 ? currentJob : 'No especificado'}
                     </Box>
 
-                    <Box fontWeight="fontWeightBold" fontSize={13}> Especialidad: </Box>
-                    <Box pl={1} fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%" width="90%">
+                    <Box fontWeight="fontWeightBold" fontSize={13} display="flex">
+                      <StarIcon />
+                      <Box marginTop="1%" marginLeft="1%">Especialidad:</Box>
+                    </Box>
+                    <Box pl={4} fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%" width="90%">
                       {specialty.length !== 0 ? specialty : 'No especificado'}
                     </Box>
 
-                    <Box fontWeight="fontWeightBold" fontSize={13}> Perfil: </Box>
-                    <Box pl={1} fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%" width="90%">
+                    <Box fontWeight="fontWeightBold" fontSize={13} display="flex">
+                      <AccountBoxIcon />
+                      <Box marginTop="1%" marginLeft="1%">Perfil:</Box>
+                    </Box>
+                    <Box pl={4} fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%" width="90%">
                       {profile.length !== 0 ? profile : 'No especificado'}
                     </Box>
 
-                    <Box fontWeight="fontWeightBold" fontSize={13}> Institución: </Box>
-                    <Box pl={1} fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%" width="90%">
+                    <Box fontWeight="fontWeightBold" fontSize={13} display="flex">
+                      <AccountBalanceIcon />
+                      <Box marginTop="1%" marginLeft="1%">Institución:</Box>
+                    </Box>
+                    <Box pl={4} fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%" width="90%">
                       {institution.length !== 0 ? institution : 'No especificado'}
                     </Box>
 
-                    <Box fontWeight="fontWeightBold" fontSize={13}> Conocimientos Técnicos: </Box>
-                    <Box pl={1} fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%" width="90%">
+                    <Box fontWeight="fontWeightBold" fontSize={13} display="flex">
+                      <ImportantDevicesIcon />
+                      <Box marginTop="1%" marginLeft="1%">Conocimientos Técnicos:</Box>
+                    </Box>
+                    <Box pl={4} fontWeight="fontWeightRegular" fontSize={13} marginBottom="5%" width="90%">
                       {techKnowledge.length !== 0 ? techKnowledge : 'No especificado'}
                     </Box>
                   </Typography>
@@ -489,6 +533,18 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
                       onChange={(c) => { setName(c.target.value); }}
                       id="name"
                       name="name"
+                      variant="filled"
+                    />
+                  </div>
+                  <div>
+                    Apellido:
+                    <TextField
+                      margin="dense"
+                      fullWidth
+                      value={lastName}
+                      onChange={(c) => { setLastName(c.target.value); }}
+                      id="lastName"
+                      name="lastName"
                       variant="filled"
                     />
                   </div>
@@ -518,6 +574,7 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
                       id="email"
                       name="email"
                       variant="filled"
+                      value={contactInfo.email}
                     />
                   </div>
                   <div>
@@ -534,6 +591,7 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
                       id="phone"
                       name="phone"
                       variant="filled"
+                      value={contactInfo.phone}
                     />
                   </div>
                   <div>
@@ -553,6 +611,7 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
                       id="country"
                       name="country"
                       variant="filled"
+                      value={contactInfo.address.country}
                     />
                   </div>
                   <div>
@@ -573,7 +632,6 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
                       id="street"
                       name="street"
                       variant="filled"
-                      placeholder="Calle"
                     />
                     Número (Dirección)
                     <TextField
@@ -592,7 +650,6 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
                       id="number"
                       name="number"
                       variant="filled"
-                      placeholder="numero"
                     />
                     Comuna (Dirección)
                     <TextField
@@ -700,7 +757,9 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
               )}
           </div>
           <div className={classes.rightContainer}>
-            <Button onClick={() => { editProfileV1(); }}> Edit </Button>
+            {editFirst === true
+              ? <Button onClick={() => { editProfileV1(); }}> Confirmar </Button>
+              : <Button onClick={() => { editProfileV1(); }}> Edit </Button>}
             <StateDropDown />
           </div>
         </div>
