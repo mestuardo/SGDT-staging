@@ -23,7 +23,7 @@ function SavedOffersList(props: SavedOffersListProps) {
   }
 
   const {
-    loading, data, refetch,
+    loading, refetch,
   } = useQuery<SavedOffersDataType>(SAVED_JOB_OFFERS_OBJECTS, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'network-only',

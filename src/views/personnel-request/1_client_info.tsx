@@ -260,17 +260,17 @@ export default function ClientInfo(props: ClientInfoProps) : JSX.Element {
             </FormControl>
             <FormControl
               className={classes.formControl}
-              style={{ width: 200, margin: theme.spacing(1) }}
+              style={{ width: 270, margin: theme.spacing(1) }}
             >
               <Autocomplete
                 multiple
                 id="languages"
                 options={languages}
-                getOptionLabel={(option:{ id:string, label: string, language:string, level:string }) => `${option.label}`}
+                getOptionLabel={(option:{ id:string, label: string, language:string, level:string, type:string }) => `${option.label}`}
                 getOptionSelected={(option, value) => option.id === value.id}
                 size="small"
                 disableCloseOnSelect
-                limitTags={3}
+                limitTags={5}
                 value={values.languages}
                 onChange={(e, value) => setFieldValue('languages', value)}
                 renderOption={(option, { selected }) => (

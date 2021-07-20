@@ -9,6 +9,7 @@
         "@material-ui/icons": "^4.11.2",
         "@material-ui/lab": "*",
         "@material-ui/pickers": "^3.3.10",
+        "@react-keycloak/core": "^3.2.0",
         "@react-keycloak/ssr": "^3.0.0",
         "apollo-upload-client": "^16.0.0",
         "clsx": "latest",

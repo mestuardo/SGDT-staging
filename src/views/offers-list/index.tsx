@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Grid, Paper, Tab, Tabs, Hidden
+  Grid, Paper, Tab, Tabs,
 } from '@material-ui/core';
 import TabPanel from '../tab_panel';
 import assignIdToTab from '../../helpers/assign_id_to_tab';

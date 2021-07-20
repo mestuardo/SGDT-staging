@@ -64,7 +64,7 @@ export default function SignIn(props: FormProps): JSX.Element {
       return <CircularProgress color="primary" />;
     }
     if (mutationError) {
-      // if (mutationError) return <div>{JSON.stringify(mutationError, null, 2)}</div>;
+      if (mutationError) return <div>{JSON.stringify(mutationError, null, 2)}</div>;
       return <p>Error. Por favor intente de nuevo</p>;
     }
     return (
@@ -102,10 +102,11 @@ export default function SignIn(props: FormProps): JSX.Element {
             formationStatus: formSchema.formationStatus,
             internalRep: '609b4b9c4cfb419054fe7955', // TODO: change for real internal rep
             levelOfStudies: formSchema.levelOfStudies,
-            // TODO: change for real types
             languages: formSchema.languages.map(
-              (lang:{ id: string; label: string; language: string; level: string; }) => (
-                { language: lang.language, level: lang.level, type: 'WRITING' }
+              (
+                lang:{ id: string; label: string; language: string; level: string; type: string },
+              ) => (
+                { language: lang.language, level: lang.level, type: lang.type }
               ),
             ),
             maxSalary: +formSchema.maxSalary,

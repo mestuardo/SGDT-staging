@@ -9,12 +9,17 @@ query Query($getProfessionalProfessionalId: ID!) {
     currentJob
     savedJobOffers
     profile
+    institutions
     technicalKnowledge
     education {
       id
       title
       period
       description
+      educationType {
+        degree
+        completed
+      }
     }
     skills {
       id
@@ -32,6 +37,14 @@ query Query($getProfessionalProfessionalId: ID!) {
     contactInfo {
       phone
       email
+      address {
+        country
+        city
+        comuna
+        street
+        number
+      }
     }
+    birthDay
   }
 }

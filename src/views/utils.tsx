@@ -72,41 +72,21 @@ export const languageObjectTransformer = (languageObject: Language): string => `
 
 export const technicalRequirementTransformer = (technicalRequirementObject: TechnicalRequirement): string => `${typeOfTechnicalRequirement(technicalRequirementObject.obligatoriness)}: ${technicalRequirementObject.requirement}`;
 
-interface JobOfferDataType {
-  requiredProfile: { field: string, value:string }[],
-  contractInformation: { field: string, value:string }[],
-  additionInformation: { field: string, value:string }[],
-}
-
 export const processJobOffer = (
   jobOfferObject: ProfessionalJobOfferDetail,
-): JobOfferDataType => {
-  const jobOfferData = {
-    requiredProfile: [
-      {
-        field: 'Cargo requerido',
-        value: jobOfferObject.position,
-      },
-      { field: 'Vacantes', value: jobOfferObject.vacancies?.toString() || '' },
-      { field: 'Años de experiencia', value: jobOfferObject.yearsExperience?.toString() || '' },
-      { field: 'Formación académica', value: `${levelOfStudiesTransformer(jobOfferObject.levelOfStudies)}` },
-      { field: 'Dirección Laboral', value: jobOfferObject.workAddress ? `${jobOfferObject.workAddress.street} ${jobOfferObject.workAddress.number}, ${jobOfferObject.workAddress.comuna}, ${jobOfferObject.workAddress.city}` : '' },
-
-    ],
-    contractInformation: [
-      {
-        field: 'Requisitos técnicos',
-        value: jobOfferObject.technicalRequirements?.map((technicalRequirementObject) => technicalRequirementTransformer(technicalRequirementObject)).join('\n') || '',
-      },
-    ],
-    additionInformation: [
-      { field: 'Idiomas', value: jobOfferObject.languages?.map((languageObject) => languageObjectTransformer(languageObject)).join('\n') || '' },
-
-    ],
-  };
-  jobOfferData.requiredProfile = jobOfferData.requiredProfile.filter((fieldObject) => fieldObject.value !== '');
-  jobOfferData.contractInformation = jobOfferData.contractInformation.filter((fieldObject) => fieldObject.value !== '');
-  jobOfferData.additionInformation = jobOfferData.additionInformation.filter((fieldObject) => fieldObject.value !== '');
-
+): { field: string, value:string }[] => {
+  let jobOfferData = [
+    { field: 'Cargo requerido', value: jobOfferObject.position },
+    { field: 'Vacantes', value: jobOfferObject.vacancies?.toString() || '' },
+    { field: 'Años de experiencia', value: jobOfferObject.yearsExperience?.toString() || '' },
+    { field: 'Formación académica', value: `${levelOfStudiesTransformer(jobOfferObject.levelOfStudies)}` },
+    { field: 'Dirección Laboral', value: jobOfferObject.workAddress ? `${jobOfferObject.workAddress.street} ${jobOfferObject.workAddress.number}, ${jobOfferObject.workAddress.comuna}, ${jobOfferObject.workAddress.city}` : '' },
+    {
+      field: 'Requisitos técnicos',
+      value: jobOfferObject.technicalRequirements?.map((technicalRequirementObject) => technicalRequirementTransformer(technicalRequirementObject)).join('\n') || '',
+    },
+    { field: 'Idiomas', value: jobOfferObject.languages?.map((languageObject) => languageObjectTransformer(languageObject)).join('\n') || '' },
+  ];
+  jobOfferData = jobOfferData.filter((fieldObject) => fieldObject.value !== '');
   return jobOfferData;
 };

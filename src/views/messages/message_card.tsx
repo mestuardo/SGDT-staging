@@ -14,13 +14,27 @@ interface MessageCardProps {
 export default function MessageCard(props: MessageCardProps) : JSX.Element {
   const { message } = props;
   return (
-    <Card style={{ alignContent: 'left' }}>
+    <Card
+      variant="outlined"
+      style={{
+        maxWidth: '300px',
+        textAlign: message.senderOptions === 'RECRUITER' ? 'right' : 'left',
+        backgroundColor: message.senderOptions === 'RECRUITER' ? '#FFF7C8' : '#D3FFC8',
+        margin: '8px',
+        borderRadius: message.senderOptions === 'RECRUITER' ? '14px 14px 0 14px' : '14px 14px 14px 0px',
+      }}
+    >
       <CardContent>
-        <Typography variant="caption" component="div">
+        <Typography variant="body2" component="div">
           <Box fontWeight="fontWeightMedium" display="inline">{`${message.senderName} `}</Box>
-          {new Date(message.createdAt).toLocaleDateString()}
         </Typography>
         <Typography variant="caption" component="div">
+          <Box fontWeight="fontWeightMedium" display="inline">{`${message.senderOptions === 'RECRUITER' ? 'Reclutador ' : 'Área comercial'} `}</Box>
+        </Typography>
+        <Typography variant="caption" component="div">
+          {new Date(message.createdAt).toLocaleDateString()}
+        </Typography>
+        <Typography style={{ textAlign: 'left' }} variant="caption" component="div">
           {message.message}
         </Typography>
       </CardContent>

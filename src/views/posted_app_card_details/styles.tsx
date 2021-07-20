@@ -14,6 +14,22 @@ const postedAppCardStyles = makeStyles((theme) => ({
     margin: theme.spacing(0, 0),
     marginLeft: theme.spacing(1),
   },
+  gridJobOfferItem: {
+    margin: theme.spacing(0, 0),
+    marginLeft: theme.spacing(1),
+    overflowY: 'auto',
+    '&::-webkit-scrollbar': {
+      width: 6,
+    },
+    '&::-webkit-scrollbar-track': {
+      borderRadius: '8px',
+      boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      borderRadius: '8px',
+      backgroundColor: 'darkgrey',
+    },
+  },
   tabpanel: {
     margin: '0',
     minHeight: '500px',
@@ -43,7 +59,8 @@ const postedAppCardStyles = makeStyles((theme) => ({
   },
 
   accordionHeading: {
-    margin: 'auto',
+    textAlign: 'center',
+    margin: '5px auto',
     '@media only screen and (max-width: 768px)': {
       fontSize: 'medium',
     },
@@ -54,7 +71,9 @@ const postedAppCardStyles = makeStyles((theme) => ({
   },
   YgridList: {
     minHeight: theme.spacing(56),
+    maxHeight: theme.spacing(60),
     textAlign: 'center',
+    overflowY: 'auto',
     // Here the scrollbar is stylized
     '&::-webkit-scrollbar': {
       width: 10,

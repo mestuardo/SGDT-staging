@@ -23,7 +23,7 @@ function AppliedOffersList(props: AppliedOffersListProps) {
   }
 
   const {
-    loading, data, refetch,
+    loading, refetch,
   } = useQuery<AppliedOffersDataType>(APPLIED_JOB_OFFERS_OBJECTS, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'network-only',

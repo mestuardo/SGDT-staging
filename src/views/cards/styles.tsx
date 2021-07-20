@@ -136,6 +136,7 @@ export const offerCardStyles = makeStyles((theme: Theme) => createStyles({
   root: {
     maxWidth: 230,
     margin: theme.spacing(1),
+    padding: 0,
   },
   content: {
     height: 70,

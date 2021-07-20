@@ -4,7 +4,7 @@ export interface CreateRequestTypeString {
   formationStatus: string,
   internalRep:string,
   levelOfStudies: string,
-  languages: { id: string; label: string; language: string; level: string; }[],
+  languages: { id: string; label: string; language: string; level: string; type: string }[],
   maxSalary: string,
   position: string,
   contractType_1: string,
@@ -37,7 +37,8 @@ export interface CreateRequestTypeString {
   workAdress_street: string,
   workAdress_number: string,
   yearsExperience: string,
-  [key: string]:string | Date | { id: string; label: string; language: string; level: string; }[] |
+  [key: string]:string | Date |
+  { id: string; label: string; language: string; level: string; type: string }[] |
   { requirement: string, obligatoriness: string }[] |
   { requirement: string, obligatoriness: string }
 }

@@ -1,14 +1,15 @@
 import React from 'react';
 import {
-  Button,
   Card,
-  CircularProgress,
   CardActionArea,
   CardMedia,
   CardContent,
   CardActions,
+  IconButton,
   Typography,
 } from '@material-ui/core';
+import { AddCircle } from '@material-ui/icons';
+import DeleteIcon from '@material-ui/icons/Delete';
 import { useMutation } from '@apollo/client';
 import SAVE_JOB_OFFER from '../../mutations/saveJobOffer.graphql';
 import UNSAVE_JOB_OFFER from '../../mutations/unsaveJobOffer.graphql';
@@ -44,7 +45,7 @@ export default function OfferCard(props:JobOfferCardProps) : JSX.Element {
     SAVE_JOB_OFFER,
   );
   const [unsaveOffer,
-    { loading: unsaveOfferMutationLoading, error: unsaveOfferMutationError }] = useMutation(
+    { error: unsaveOfferMutationError }] = useMutation(
     UNSAVE_JOB_OFFER,
   );
 
@@ -91,20 +92,18 @@ export default function OfferCard(props:JobOfferCardProps) : JSX.Element {
           {jobOffer.position}
         </Typography>
       </CardContent>
-      {allowSave && (
-        <CardActions>
-          <Button size="small" color="primary" onClick={handleSave} disabled={isSaved}>
-            {saveOfferMutationLoading ? <CircularProgress size={15} /> : 'Guardar'}
-          </Button>
-        </CardActions>
-      )}
-      {allowUnsave && (
-        <CardActions>
-          <Button size="small" color="primary" onClick={handleUnsave}>
-            {unsaveOfferMutationLoading ? <CircularProgress size={15} /> : 'Eliminar'}
-          </Button>
-        </CardActions>
-      )}
+      <CardActions style={{ justifyContent: 'center', padding: 0 }}>
+        {allowSave && (
+          <IconButton onClick={handleSave} disabled={isSaved} color={saveOfferMutationLoading ? 'secondary' : 'primary'}>
+            <AddCircle />
+          </IconButton>
+        )}
+        {allowUnsave && (
+          <IconButton onClick={handleUnsave}>
+            <DeleteIcon />
+          </IconButton>
+        )}
+      </CardActions>
     </Card>
   );
 }

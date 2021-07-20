@@ -37,8 +37,6 @@ function NewOffersList(props: NewOffersListProps) {
 
   const {
     loading: allJobOffersLoading,
-    // error: allJobOffersError,
-    data: allJobOffersData,
     refetch: allJobOffersRefetch,
     networkStatus: allJobOffersNetworkStatus,
   } = useQuery<AllJobOffersDataType>(ALL_JOB_OFFERS_OBJECTS, {
@@ -55,11 +53,6 @@ function NewOffersList(props: NewOffersListProps) {
   }
 
   const {
-    /*
-    loading: savedJobOffersLoading,
-    error: savedJobOffersError,
-    */
-    data: savedJobOffersData,
     refetch: savedJobOffersRefetch,
   } = useQuery<SavedJobOffersDataType>(SAVED_JOB_OFFERS_IDS, {
     notifyOnNetworkStatusChange: true,
@@ -68,11 +61,6 @@ function NewOffersList(props: NewOffersListProps) {
   });
 
   const {
-    /*
-    loading: appliedJobOffersLoading,
-    error: appliedJobOffersError,
-    */
-    data: appliedJobOffersData,
     refetch: appliedJobOffersRefetch,
   } = useQuery<AppliedJobOffersDataType>(APPLIED_JOB_OFFERS_IDS, {
     notifyOnNetworkStatusChange: true,
@@ -89,40 +77,13 @@ function NewOffersList(props: NewOffersListProps) {
     setOpenDialog(true);
   };
 
-  const handleSaveSuccess = (offerId: string) => {
-    const savedIdsCopy = new Set(savedOffersIds);
-    savedIdsCopy.add(offerId);
-    setSavedOffersIds(savedIdsCopy);
-  };
-
-  const handleApplySuccess = (offerId: string) => {
-    const appliedIdsCopy = new Set(appliedOffersIds);
-    appliedIdsCopy.add(offerId);
-    setAppliedOffersIds(appliedIdsCopy);
-  };
-
-  /*
-  React.useEffect(() => {
-    if (savedJobOffersData && savedJobOffersData.getSavedJobOffers) {
-      const newSavedIds = new Set(
-        savedJobOffersData.getSavedJobOffers.map((jobOffer) => jobOffer.id),
-      );
-      setSavedOffersIds(newSavedIds);
-    }
-  }, [savedJobOffersData, savedOffersIds]);
-  */
-
   const refetchAll = () => {
-    console.log('Gonna refetch all');
     const jobOffersObjectsPromise = allJobOffersRefetch();
     const savedJobOffersIdsPromise = savedJobOffersRefetch();
     const appliedSavedJobOffersIdsPromise = appliedJobOffersRefetch();
     Promise.all([
       jobOffersObjectsPromise, appliedSavedJobOffersIdsPromise, savedJobOffersIdsPromise,
     ]).then(([allJobOffersResponse, appliedJobOffersResponse, savedJobOffersResponse]) => {
-      console.log('allJobOffersData', allJobOffersResponse);
-      console.log('appliedJobOffersData', appliedJobOffersResponse);
-      console.log('savedJobOffersData', savedJobOffersResponse);
       if (savedJobOffersResponse.data) {
         const newSavedIds = new Set(
           savedJobOffersResponse.data.getSavedJobOffers.map((jobOffer) => jobOffer.id),
@@ -143,6 +104,18 @@ function NewOffersList(props: NewOffersListProps) {
     }).catch((error) => { throw (error); });
   };
 
+  const handleSaveSuccess = (offerId: string) => {
+    const savedIdsCopy = new Set(savedOffersIds);
+    savedIdsCopy.add(offerId);
+    setSavedOffersIds(savedIdsCopy);
+  };
+
+  const handleApplySuccess = (offerId: string) => {
+    const appliedIdsCopy = new Set(appliedOffersIds);
+    appliedIdsCopy.add(offerId);
+    setAppliedOffersIds(appliedIdsCopy);
+  };
+
   React.useEffect(() => {
     refetchAll();
   },
@@ -151,15 +124,16 @@ function NewOffersList(props: NewOffersListProps) {
   const loadingOrRefetching = allJobOffersLoading
     || allJobOffersNetworkStatus === NetworkStatus.refetch;
 
+  const filteredOffers = offers.filter((jobOffer) => !appliedOffersIds.has(jobOffer.id));
+
   return (
     <>
-      {allJobOffersNetworkStatus === NetworkStatus.refetch && <p>Refetching</p>}
       {loadingOrRefetching && <CircularProgress />}
-      {!loadingOrRefetching && !offers.length && (
+      {!loadingOrRefetching && !filteredOffers.length && (
         <p>No hay nuevas ofertas actualmente.</p>
       )}
       <GridList className={classes.YgridList} cols={cols} cellHeight="auto" style={{ margin: 'auto' }}>
-        {offers.filter((jobOffer) => !appliedOffersIds.has(jobOffer.id)).map((jobOffer) => (
+        {filteredOffers.map((jobOffer) => (
           <GridListTile key={jobOffer.id} className={classes.GridListTile}>
             <OfferCard
               key={jobOffer.id}

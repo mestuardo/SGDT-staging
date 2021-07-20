@@ -57,15 +57,14 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
     >
       <Grid item xs={12}>
         <Typography variant="body1" component="h6">
+          <Box fontWeight="fontWeightMedium" display="inline">Cliente:</Box>
+          {' '}
           {jobOffer.client}
         </Typography>
         <hr />
       </Grid>
 
       <Grid item xs={12} sm={7}>
-        <Typography gutterBottom variant="h5" component="h5">
-          Detalles
-        </Typography>
         <div className={classes.detailBody}>
           {jobOffer.closeMessage ? (
             <Typography variant="body1" component="div">
@@ -196,9 +195,6 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
       <Grid item xs={12} sm={5}>
         <Hidden smUp><hr /></Hidden>
 
-        <Typography gutterBottom variant="h5" component="h5">
-          Acciones
-        </Typography>
         <div className={classes.detailBody} style={{ textAlign: 'center' }}>
           <Button
             color="primary"

@@ -41,19 +41,23 @@ export default function NewMessageCard(props: NewMessageCardProps): JSX.Element 
   };
 
   return (
-    <div>
+    <div style={{
+      display: 'grid',
+    }}
+    >
       <TextField
+        style={{ width: '70%', justifySelf: 'center' }}
         label="Mensaje"
-        style={{ width: '90%' }}
         margin="normal"
         multiline
         value={msg}
         onChange={(e) => setMsg(e.target.value)}
-        rows={4}
+        rows={2}
         variant="outlined"
         inputProps={{ style: { fontSize: 'small' } }}
       />
       <Button
+        style={{ margin: 'auto' }}
         variant="outlined"
         onClick={handleSendMessage}
         disabled={(createMessageLoading)}

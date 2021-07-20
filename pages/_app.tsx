@@ -2,6 +2,7 @@ import React from 'react';
 import Head from 'next/head';
 import { AppProps, AppContext } from 'next/app';
 import { SSRKeycloakProvider, SSRCookies } from '@react-keycloak/ssr';
+import { AuthClientTokens } from '@react-keycloak/core';
 import type { KeycloakConfig } from 'keycloak-js';
 import cookie from 'cookie';
 import type { IncomingMessage } from 'http';
@@ -15,6 +16,12 @@ const keycloakCfg: KeycloakConfig = {
   url: process.env.NEXT_PUBLIC_KEYCLOAK_URL,
   realm: process.env.NEXT_PUBLIC_KEYCLOAK_REALM as string,
   clientId: process.env.NEXT_PUBLIC_KEYCLOAK_CLIENTID as string,
+};
+
+// this function is called every time one of the keycloak tokens change
+// So it'll update the token on login, logout, etc
+const tokenLogger = (tokens: AuthClientTokens) => {
+  localStorage.setItem('token', tokens?.token ? tokens.token : '');
 };
 
 function MyApp({ Component, pageProps, cookies }: AppProps & InitialProps): JSX.Element {
@@ -33,6 +40,7 @@ function MyApp({ Component, pageProps, cookies }: AppProps & InitialProps): JSX.
     <SSRKeycloakProvider
       keycloakConfig={keycloakCfg}
       persistor={SSRCookies(cookies)}
+      onTokens={tokenLogger}
     >
       <Head>
         <title>SGDT</title>

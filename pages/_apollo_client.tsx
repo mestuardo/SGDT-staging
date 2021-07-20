@@ -6,8 +6,6 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { createUploadLink } from 'apollo-upload-client';
 import Container from '@material-ui/core/Container';
-import { useKeycloak } from '@react-keycloak/ssr';
-import type { KeycloakInstance } from 'keycloak-js';
 
 import theme from '../src/theme';
 import Drawer from '../src/drawer';
@@ -40,16 +38,6 @@ interface ApolloComponentProps {
 export default function ApolloClientComponent(
   { childComponent }: ApolloComponentProps,
 ): JSX.Element {
-  const { keycloak, initialized } = useKeycloak<KeycloakInstance>();
-
-  React.useEffect(() => {
-    localStorage.setItem('token', keycloak?.token ? keycloak.token : '');
-  }, [keycloak, keycloak?.token]);
-
-  if (!initialized && keycloak?.token && localStorage.setItem('token', keycloak.token)) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>

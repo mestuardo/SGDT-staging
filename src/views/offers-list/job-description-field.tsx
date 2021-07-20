@@ -10,7 +10,7 @@ const JobDescriptionField: React.FC<JobDescriptionFieldProps> = ({
   field,
   value,
 }: JobDescriptionFieldProps) => (
-  <Typography style={{marginBottom: 10}}>
+  <Typography style={{ marginBottom: 10 }}>
     <Box fontWeight="fontWeightMedium" display="inline">
       {field}
       :

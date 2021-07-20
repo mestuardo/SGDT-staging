@@ -1,5 +1,7 @@
 import React from 'react';
-import { Avatar, Button, Typography } from '@material-ui/core';
+import {
+  Avatar, Box, Button, Typography,
+} from '@material-ui/core';
 import { GetProfessionalType } from '../../types/get-professional-types';
 import { FilterApplicationsType } from '../../types/filter-applications-query-types';
 import UploadButton from './document-upload';
@@ -14,11 +16,28 @@ export const initProfessional: GetProfessionalType = {
   currentJob: '',
   savedJobOffers: [''],
   profile: '',
+  institutions: '',
   technicalKnowledge: '',
-  education: [],
-  skills: [],
-  pastJobs: [],
-  contactInfo: { phone: '', email: '' },
+  education: [{
+    id: '', title: '', period: '', description: '', educationType: { degree: '', completed: false },
+  }],
+  skills: [{ id: '', title: '', body: '' }],
+  pastJobs: [{
+    id: '',
+    companyName: '',
+    period: '',
+    position: '',
+    functions: '',
+    technologiesUsed: '',
+  }],
+  contactInfo: {
+    phone: '',
+    email: '',
+    address: {
+      country: '', city: '', comuna: '', street: '', number: '',
+    },
+  },
+  birthDay: new Date(),
 };
 
 export const initApplication: FilterApplicationsType = {
@@ -98,9 +117,70 @@ export const getButtons = (
             {' '}
             {currentPro.firstSurname}
           </h2>
-          <div>{currentPro.specialty}</div>
-          <div>{currentPro.rut}</div>
-          <div>{currentPro.currentJob}</div>
+          <div>{`Especialidad: ${currentPro.specialty}`}</div>
+          <div>{`RUT: ${currentPro.rut}`}</div>
+          {currentPro.birthDay !== null ? <div>{`Fecha de nacimiento: ${new Date(currentPro.birthDay).toLocaleDateString()}`}</div> : null}
+          {currentPro.currentJob !== null ? <div>{`Trabajo actual: ${currentPro.currentJob}`}</div> : null}
+          {currentPro.institutions !== null ? <div>{`Instituciones: ${currentPro.institutions}`}</div> : null}
+          {currentPro.technicalKnowledge !== null ? <div>{`Conocimientos técnicos: ${currentPro.technicalKnowledge}`}</div> : null}
+          {currentPro.profile !== null ? <div>{`Perfil: ${currentPro.profile}`}</div> : null}
+          <h3>Educación</h3>
+          <div>
+            {currentPro.education.map((ed) => (
+              <div key={ed.id}>
+                {`${ed.title}: ${ed.period} - ${ed.description}`}
+              </div>
+            ))}
+          </div>
+          <h3>Skills</h3>
+          <div>
+            {currentPro.skills.map((skill) => (
+              <div key={skill.id}>
+                {`${skill.title}: ${skill.body}`}
+              </div>
+            ))}
+          </div>
+          <h3>Trabajos anteriores</h3>
+          <div>
+            {currentPro.pastJobs.map((job) => (
+              <div key={job.id}>
+                {`${job.position} en ${job.companyName}; ${job.period}`}
+              </div>
+            ))}
+          </div>
+          <h3>Respuesta a preguntas</h3>
+          <div>
+            {currentApp.answers.map((answer, index) => (
+              <div key={answer} style={{ textAlign: 'left' }}>
+                <Box fontWeight="fontWeightMedium" display="inline">{`Respuesta a pregunta ${index + 1}: `}</Box>
+                {answer}
+              </div>
+            ))}
+          </div>
+          <h3>Datos de contacto</h3>
+          {currentPro.contactInfo !== null
+            ? (
+              <div style={{ textAlign: 'left' }}>
+                <div>
+                  <Box fontWeight="fontWeightMedium" display="inline">Teléfono: </Box>
+                  {currentPro.contactInfo.phone}
+                </div>
+                <div>
+                  <Box fontWeight="fontWeightMedium" display="inline">E-mail: </Box>
+                  {currentPro.contactInfo.email}
+                </div>
+                {currentPro.contactInfo.address
+                  ? (
+                    <div>
+                      <Box fontWeight="fontWeightMedium" display="inline">Dirección: </Box>
+                      {`${currentPro.contactInfo.address.street} ${currentPro.contactInfo.address.number}, ${currentPro.contactInfo.address.comuna}, ${currentPro.contactInfo.address.city}, ${currentPro.contactInfo.address.country}`}
+                    </div>
+                  )
+                  : null }
+              </div>
+            )
+            : <div>Teléfono: - E-mail: - Dirección: -</div>}
+          {showApplicationFiles(currentApp)}
           <h3>Motivo del rechazo</h3>
           <div>{currentApp.rejectedMessage}</div>
         </>
@@ -114,9 +194,69 @@ export const getButtons = (
             {' '}
             {currentPro.firstSurname}
           </h2>
-          <div>{currentPro.specialty}</div>
-          <div>{currentPro.rut}</div>
-          <div>{currentPro.currentJob}</div>
+          <div>{`Especialidad: ${currentPro.specialty}`}</div>
+          <div>{`RUT: ${currentPro.rut}`}</div>
+          {currentPro.birthDay !== null ? <div>{`Fecha de nacimiento: ${new Date(currentPro.birthDay).toLocaleDateString()}`}</div> : null}
+          {currentPro.currentJob !== null ? <div>{`Trabajo actual: ${currentPro.currentJob}`}</div> : null}
+          {currentPro.institutions !== null ? <div>{`Instituciones: ${currentPro.institutions}`}</div> : null}
+          {currentPro.technicalKnowledge !== null ? <div>{`Conocimientos técnicos: ${currentPro.technicalKnowledge}`}</div> : null}
+          {currentPro.profile !== null ? <div>{`Perfil: ${currentPro.profile}`}</div> : null}
+          <h3>Educación</h3>
+          <div>
+            {currentPro.education.map((ed) => (
+              <div key={ed.id}>
+                {`${ed.title}: ${ed.period} - ${ed.description}`}
+              </div>
+            ))}
+          </div>
+          <h3>Skills</h3>
+          <div>
+            {currentPro.skills.map((skill) => (
+              <div key={skill.id}>
+                {`${skill.title}: ${skill.body}`}
+              </div>
+            ))}
+          </div>
+          <h3>Trabajos anteriores</h3>
+          <div>
+            {currentPro.pastJobs.map((job) => (
+              <div key={job.id}>
+                {`${job.position} en ${job.companyName}; ${job.period}`}
+              </div>
+            ))}
+          </div>
+          <h3>Respuesta a preguntas</h3>
+          <div>
+            {currentApp.answers.map((answer, index) => (
+              <div key={answer} style={{ textAlign: 'left' }}>
+                <Box fontWeight="fontWeightMedium" display="inline">{`Respuesta a pregunta ${index + 1}: `}</Box>
+                {`${answer}`}
+              </div>
+            ))}
+          </div>
+          <h3>Datos de contacto</h3>
+          {currentPro.contactInfo !== null
+            ? (
+              <div style={{ textAlign: 'left' }}>
+                <div>
+                  <Box fontWeight="fontWeightMedium" display="inline">Teléfono: </Box>
+                  {currentPro.contactInfo.phone}
+                </div>
+                <div>
+                  <Box fontWeight="fontWeightMedium" display="inline">E-mail: </Box>
+                  {currentPro.contactInfo.email}
+                </div>
+                {currentPro.contactInfo.address
+                  ? (
+                    <div>
+                      <Box fontWeight="fontWeightMedium" display="inline">Dirección: </Box>
+                      {`${currentPro.contactInfo.address.street} ${currentPro.contactInfo.address.number}, ${currentPro.contactInfo.address.comuna}, ${currentPro.contactInfo.address.city}, ${currentPro.contactInfo.address.country}`}
+                    </div>
+                  )
+                  : null }
+              </div>
+            )
+            : <div>Teléfono: - E-mail: - Dirección: -</div>}
           {showApplicationFiles(currentApp)}
           <UploadButton
             applicationId={currentApp.id}
@@ -127,12 +267,14 @@ export const getButtons = (
               ? 'CONVERTIR EN CANDIDATO'
               : 'PASAR A SIGUIENTE FASE'}
           </Button>
-          {currentApp.stage === 'JOB_OFFER' ? null
-            : (
-              <Button onClick={handleOpenRejectDialog} style={{ color: 'red' }}>
-                Rechazar
-              </Button>
-            )}
+          <div>
+            {currentApp.stage === 'JOB_OFFER' ? null
+              : (
+                <Button onClick={handleOpenRejectDialog} style={{ color: 'red' }}>
+                  Rechazar
+                </Button>
+              )}
+          </div>
         </>
       );
     case 'ACCEPTED':
@@ -144,9 +286,80 @@ export const getButtons = (
             {' '}
             {currentPro.firstSurname}
           </h2>
-          <div>{currentPro.specialty}</div>
-          <div>{currentPro.rut}</div>
-          <div>{currentPro.currentJob}</div>
+          <div>{`Especialidad: ${currentPro.specialty}`}</div>
+          <div>{`RUT: ${currentPro.rut}`}</div>
+          {currentPro.birthDay !== null ? <div>{`Fecha de nacimiento: ${new Date(currentPro.birthDay).toLocaleDateString()}`}</div> : null}
+          {currentPro.currentJob !== null ? <div>{`Trabajo actual: ${currentPro.currentJob}`}</div> : null}
+          {currentPro.institutions !== null ? <div>{`Instituciones: ${currentPro.institutions}`}</div> : null}
+          {currentPro.technicalKnowledge !== null ? <div>{`Conocimientos técnicos: ${currentPro.technicalKnowledge}`}</div> : null}
+          {currentPro.profile !== null ? <div>{`Perfil: ${currentPro.profile}`}</div> : null}
+          <h3>Educación</h3>
+          <div>
+            {currentPro.education.map((ed) => (
+              <div key={ed.id}>
+                {`${ed.title}: ${ed.period} - ${ed.description}`}
+              </div>
+            ))}
+          </div>
+          <h3>Skills</h3>
+          <div>
+            {currentPro.skills.map((skill) => (
+              <div key={skill.id}>
+                {`${skill.title}: ${skill.body}`}
+              </div>
+            ))}
+          </div>
+          <h3>Trabajos anteriores</h3>
+          <div>
+            {currentPro.pastJobs.map((job) => (
+              <div key={job.id}>
+                {`${job.position} en ${job.companyName}; ${job.period}`}
+              </div>
+            ))}
+          </div>
+          <h3>Respuesta a preguntas</h3>
+          <div>
+            {currentApp.answers.map((answer, index) => (
+              <div key={answer} style={{ textAlign: 'left' }}>
+                <Box fontWeight="fontWeightMedium" display="inline">{`Respuesta a pregunta ${index + 1}: `}</Box>
+                {`${answer}`}
+              </div>
+            ))}
+          </div>
+          <h3>Datos de contacto</h3>
+          {currentPro.contactInfo !== null
+            ? (
+              <div style={{ textAlign: 'left' }}>
+                <div>
+                  <Box fontWeight="fontWeightMedium" display="inline">Teléfono: </Box>
+                  {currentPro.contactInfo.phone}
+                </div>
+                <div>
+                  <Box fontWeight="fontWeightMedium" display="inline">E-mail: </Box>
+                  {currentPro.contactInfo.email}
+                </div>
+                {currentPro.contactInfo.address
+                  ? (
+                    <div>
+                      <Box fontWeight="fontWeightMedium" display="inline">Dirección: </Box>
+                      {`${currentPro.contactInfo.address.street} ${currentPro.contactInfo.address.number}, ${currentPro.contactInfo.address.comuna}, ${currentPro.contactInfo.address.city}, ${currentPro.contactInfo.address.country}`}
+                    </div>
+                  )
+                  : null }
+              </div>
+            )
+            : <div>Teléfono: - E-mail: - Dirección: -</div>}
+          {showApplicationFiles(currentApp)}
+          <UploadButton
+            applicationId={currentApp.id}
+            jobOfferId={jobOfferId}
+          />
+          {currentApp.stage === 'JOB_OFFER' ? null
+            : (
+              <Button onClick={handleOpenRejectDialog} style={{ color: 'red' }}>
+                Rechazar
+              </Button>
+            )}
         </>
       );
     default:

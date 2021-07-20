@@ -16,7 +16,7 @@ interface AdditionalInfoProps {
 }
 
 const createData = (name: string, value: string | Date | number |
-{ id: string; label: string; language: string; level: string; }[] |
+{ id: string; label: string; language: string; level: string; type: string }[] |
 { requirement: string, obligatoriness: string }[]| {
   requirement: string;
   obligatoriness: string
@@ -84,8 +84,8 @@ export default function AdditionalInfo(props: AdditionalInfoProps) : JSX.Element
   };
 
   const stringLanguages: string[] = formSchema.languages.map(
-    (lang:{ id: string; label: string; language: string; level: string; }) => (
-      ` ${lang.language} ${lang.level}`
+    (lang:{ id: string; label: string; language: string; level: string; type: string }) => (
+      ` ${lang.label}`
     ),
   );
 
@@ -127,6 +127,7 @@ export default function AdditionalInfo(props: AdditionalInfoProps) : JSX.Element
     label: string;
     language: string;
     level: string;
+    type: string;
   }[]| {
     requirement: string;
     obligatoriness: string
