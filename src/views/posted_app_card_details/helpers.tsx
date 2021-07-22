@@ -366,7 +366,7 @@ export const getButtons = (
                 />
                 <Button
                   onClick={handleOpenApprovalDialog}
-                  disabled={(currentApp.files.length === 0) && (tempFile.length === 0)}
+                  disabled={(currentApp.files.length === 0) && (tempFile.length === 0) && currentApp.stage!=='JOB_OFFER'}
                   variant="contained"
                   color="secondary"
                 >
