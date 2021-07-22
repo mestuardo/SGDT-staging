@@ -105,7 +105,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
     }, 50);
   }, [questionQuantity]);
 
-  const redirectOnSubmit = () => router.push('/recruitment-process?postedRequests=true');
+  const redirectOnSubmit = (link:string) => router.push(link);
 
   const [SLA_1, setSLA1] = React.useState<Date | null>(null);
   const [SLA_2, setSLA2] = React.useState<Date | null>(null);
@@ -253,7 +253,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
             })
               .then(() => {
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                redirectOnSubmit();
+                redirectOnSubmit('/recruitment-process?postedRequests=true');
               })
               .catch((mutErr) => { throw (mutErr); });
           }}
@@ -594,7 +594,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
             })
               .then(() => {
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                redirectOnSubmit();
+                redirectOnSubmit('/recruitment-process?newRequests=false');
               })
               .catch((mutErr) => { throw (mutErr); })}
           >

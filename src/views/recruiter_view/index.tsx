@@ -156,36 +156,6 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
     setJobOfferSortBy(newSort);
   };
 
-  // Here we update the shown cards when the info is updated
-  React.useEffect(() => {
-    SetShownPostedRequests(SLASortedPostedJobOffers);
-    if (postedRequests === 'true') {
-      setValue(2);
-      setJobOfferSortBy('RECENT');
-      setAlertMessage('Se ha creado una solicitud satisfactoriamente');
-      setAlertOpen(true);
-    }
-  },
-  [data.jobOffers]);
-  React.useEffect(() => {
-    SetShownNewRequests(RecentSortedNewRequests);
-    if (newRequests === 'true') {
-      setValue(1);
-      setAlertMessage('Se ha publicado una solicitud satisfactoriamente');
-      setAlertOpen(true);
-    }
-  },
-  [data.requests]);
-  React.useEffect(() => {
-    SetShownNewRequests(RecentSortedNewRequests);
-    if (closedRequests === 'true') {
-      setValue(3);
-      setAlertMessage('Se ha cerrado una solicitud satisfactoriamente');
-      setAlertOpen(true);
-    }
-  },
-  [data.getClosedJobOffers]);
-
   const filterRequestDateDesc = () => SetShownNewRequests(RecentSortedNewRequests);
   const filterRequestDateAsc = () => SetShownNewRequests(DateAscSortedNewRequests);
 
@@ -227,6 +197,41 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
       ),
     );
   }, [filter]);
+
+  // Here we update the shown cards when the info is updated
+  React.useEffect(() => {
+    SetShownPostedRequests(SLASortedPostedJobOffers);
+    if (postedRequests === 'true') {
+      setValue(2);
+      setJobOfferSortBy('RECENT');
+      filterJobOfferRecent();
+      setAlertMessage('Se ha creado una solicitud satisfactoriamente');
+      setAlertOpen(true);
+    }
+  },
+  [data.jobOffers]);
+  React.useEffect(() => {
+    SetShownNewRequests(RecentSortedNewRequests);
+    if (newRequests === 'true') {
+      setValue(1);
+      setAlertMessage('Se ha publicado una solicitud satisfactoriamente');
+      setAlertOpen(true);
+    } else if (newRequests === 'false') {
+      setValue(1);
+      setAlertMessage('Se ha archivado una solicitud satisfactoriamente');
+      setAlertOpen(true);
+    }
+  },
+  [data.requests]);
+  React.useEffect(() => {
+    SetShownNewRequests(RecentSortedNewRequests);
+    if (closedRequests === 'true') {
+      setValue(3);
+      setAlertMessage('Se ha cerrado una solicitud satisfactoriamente');
+      setAlertOpen(true);
+    }
+  },
+  [data.getClosedJobOffers]);
 
   const requestsHeader = (
     <div className={classes.responsiveHeader}>
