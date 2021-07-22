@@ -20,10 +20,7 @@ export default class DocumentCreator {
       sections: [
         {
           children: [
-            new Paragraph({
-              text: `${professionalInfo.name} ${professionalInfo.firstSurname}`,
-              heading: HeadingLevel.TITLE,
-            }),
+            this.createName(professionalInfo.name, professionalInfo.firstSurname),
             this.createHeading('Perfil'),
             this.createProfile(professionalInfo.profile),
             this.createHeading('Conocimientos y Skills Técnicos'),
@@ -31,7 +28,6 @@ export default class DocumentCreator {
             this.createTechnical(professionalInfo.technicalKnowledge),
             this.createSubHeading('Skills Técnicos'),
             ...this.createSkillsList(professionalInfo.skills),
-            // agregarle los demás campos (debe tener title y body)
             this.createHeading('Experiencia Laboral'),
             ...professionalInfo.pastJobs
               .map((position) => {
@@ -78,6 +74,26 @@ export default class DocumentCreator {
           ],
         },
       ],
+      styles: {
+        default: {
+          heading1: {
+            run: {
+              size: 28,
+              bold: true,
+              color: '0a521b',
+              font: 'Verdana',
+            },
+          },
+          heading2: {
+            run: {
+              size: 24,
+              bold: true,
+              color: '0a521b',
+              font: 'Verdana',
+            },
+          },
+        },
+      },
     });
 
     return document;
@@ -87,7 +103,14 @@ export default class DocumentCreator {
     if (profile === null) {
       return new Paragraph('');
     }
-    return new Paragraph(`${profile}`);
+    return new Paragraph({
+      children: [
+        new TextRun({
+          text: `${profile}`,
+          font: 'Verdana',
+        }),
+      ],
+    });
   }
 
   public createHeading(text: string): Paragraph {
@@ -95,6 +118,23 @@ export default class DocumentCreator {
       text,
       heading: HeadingLevel.HEADING_1,
       thematicBreak: true,
+    });
+  }
+
+  public createName(name: string, lastName: string): Paragraph {
+    // return new Paragraph({
+    //   text,
+    //   heading: HeadingLevel.TITLE,
+    //   thematicBreak: true,
+    // });
+    return new Paragraph({
+      heading: HeadingLevel.TITLE,
+      children: [
+        new TextRun({
+          text: `${name} ${lastName}`,
+          font: 'Verdana',
+        }),
+      ],
     });
   }
 
@@ -120,10 +160,12 @@ export default class DocumentCreator {
         new TextRun({
           text: institutionName,
           bold: true,
+          font: 'Verdana',
         }),
         new TextRun({
           text: `\t${dateText}`,
           bold: true,
+          font: 'Verdana',
         }),
       ],
     });
@@ -135,6 +177,7 @@ export default class DocumentCreator {
         new TextRun({
           text: roleText,
           italics: true,
+          font: 'Verdana',
         }),
       ],
     });
@@ -146,6 +189,7 @@ export default class DocumentCreator {
         new TextRun({
           text: `${position} - ${functions}`,
           italics: true,
+          font: 'Verdana',
         }),
       ],
     });
@@ -153,7 +197,13 @@ export default class DocumentCreator {
 
   public createBullet(text: string): Paragraph {
     return new Paragraph({
-      text,
+      children: [
+        new TextRun({
+          text: `${text}`,
+          font: 'Verdana',
+        }),
+      ],
+      // text,
       bullet: {
         level: 0,
       },
@@ -163,7 +213,12 @@ export default class DocumentCreator {
   public createSkillsList(skills: { title: string, body: string }[]): Paragraph[] {
     return skills.map(
       (skill) => new Paragraph({
-        text: `${skill.title} - ${skill.body}`,
+        children: [
+          new TextRun({
+            text: `${skill.title} - ${skill.body}`,
+            font: 'Verdana',
+          }),
+        ],
         bullet: {
           level: 0,
         },
@@ -176,7 +231,12 @@ export default class DocumentCreator {
       return new Paragraph('');
     }
     return new Paragraph({
-      children: [new TextRun(skills)],
+      children: [
+        new TextRun({
+          text: `${skills}`,
+          font: 'Verdana',
+        }),
+      ],
     });
   }
 

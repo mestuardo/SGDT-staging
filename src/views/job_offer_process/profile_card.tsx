@@ -33,6 +33,7 @@ export default function ProfileCard(props: ProfileCardProps) : JSX.Element {
 
   const { data: professionalsData, loading, error } = useQuery<ProfessionalData>(
     GET_PROFESSIONAL, {
+      fetchPolicy: 'network-only',
       variables: { getProfessionalID: application.professionalId },
     },
   );

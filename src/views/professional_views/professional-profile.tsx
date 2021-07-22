@@ -128,23 +128,25 @@ interface ContactInfo {
   address: Address
 }
 
-const defaultContactInfo = {
-  email: ' ',
-  phone: ' ',
-  address: {
-    city: ' ',
-    comuna: ' ',
-    country: ' ',
-    number: ' ',
-    street: ' ',
-  },
-};
+const defaultContactInfo = (email: string) => (
+  {
+    email,
+    phone: ' ',
+    address: {
+      city: ' ',
+      comuna: ' ',
+      country: ' ',
+      number: ' ',
+      street: ' ',
+    },
+  }
+);
 
 function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
   // States
   const [educationCards, setEducationCards] = React.useState<EducationProps[]>([]);
   const [jobCards, setJobCards] = React.useState<JobCardProps[]>([]);
-  const [contactInfo, setContactInfo] = React.useState<ContactInfo>(defaultContactInfo);
+  const [contactInfo, setContactInfo] = React.useState<ContactInfo>(defaultContactInfo(''));
   const [yearsExperience, setYearsExperience] = React.useState<string>('');
   const [skillCards, setSkillCards] = React.useState<KnowledgeSkill[]>([]);
   const [specialty, setSpecialty] = React.useState<string>('');
@@ -386,6 +388,7 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
   };
 
   React.useEffect(() => {
+    console.log(props.data);
     setProfile(props.data.profile ? props.data.profile : '');
     setName(props.data.name ? props.data.name : '');
     setCurrentJob(props.data.currentJob ? props.data.currentJob : '');
@@ -395,7 +398,7 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
     setContactInfo(
       (
         props.data.contactInfo.phone && props.data.contactInfo.address
-      ) ? props.data.contactInfo : defaultContactInfo,
+      ) ? props.data.contactInfo : defaultContactInfo(props.data.contactInfo.email),
     );
     setYearsExperience(props.data.yearsExperience ? props.data.yearsExperience : '');
     setTechKnowledge(props.data.technicalKnowledge ? props.data.technicalKnowledge : '');

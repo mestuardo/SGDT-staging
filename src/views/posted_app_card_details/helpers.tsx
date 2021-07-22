@@ -120,6 +120,9 @@ export const getButtons = (
   const handleObjURL = (obj: { name: string, url: string }) => setTempFile(
     (prev: { name: string, url: string }[]) => [...prev, obj],
   );
+  React.useEffect(() => {
+    setTempFile([]);
+  }, [currentApp.files]);
   switch (currentApp.status) {
     case 'REJECTED':
       return (
@@ -363,7 +366,7 @@ export const getButtons = (
                 />
                 <Button
                   onClick={handleOpenApprovalDialog}
-                  disabled={currentApp.files.length === 0}
+                  disabled={(currentApp.files.length === 0) && (tempFile.length === 0)}
                   variant="contained"
                   color="secondary"
                 >
@@ -507,9 +510,6 @@ export const getButtons = (
           {isRecruiter
             ? (
               <>
-                <DocumentComponent
-                  currentProfessional={currentPro}
-                />
                 <UploadButton
                   applicationId={currentApp.id}
                   handleObjURL={handleObjURL}
