@@ -34,10 +34,9 @@ import {
   ProfessionalProfileData, EducationProps, KnowledgeSkill, JobCardProps,
 } from '../../types/get-professional-profile-types';
 import StateDropDown from '../state-dropdown';
-import professionalId from '../../global-variables';
 
 interface EditProps {
-  id?: string,
+  id?: string | null,
   name?: string,
   profile?: string,
   specialty?: string,
@@ -47,10 +46,13 @@ interface EditProps {
   position?: string,
   functions?: string,
   technologiesUsed?: string,
+  technicalKnowledge?: string,
   title?: string,
   body?: string,
   description?: string,
   career?: string,
+  birthDay?: Date,
+  institutions: string,
   deleteSkill?: (id: string, type: string) => void | '',
   skills?: { title: string, body: string }[],
   education?: {
@@ -66,7 +68,18 @@ interface EditProps {
     position: string,
     functions: string,
     technologiesUsed: string,
-  }[]
+  }[],
+  contactInfo?: {
+    phone: string,
+    email: string,
+    address: {
+      country: string,
+      city: string,
+      comuna: string,
+      street: string,
+      number: string,
+    },
+  },
 }
 
 interface CardProps {
@@ -135,7 +148,7 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
   const [yearsExperience, setYearsExperience] = React.useState<string>('');
   const [skillCards, setSkillCards] = React.useState<KnowledgeSkill[]>([]);
   const [specialty, setSpecialty] = React.useState<string>('');
-  const [birthDate, setBirthDate] = React.useState<Date | null>();
+  const [birthDate, setBirthDate] = React.useState<Date>();
   const [currentJob, setCurrentJob] = React.useState<string>('');
   const [name, setName] = React.useState<string>('');
   const [lastName, setLastName] = React.useState<string>('');
@@ -155,6 +168,7 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
   ] = useMutation<DataFetched>(PROFESSIONAL_PROFILE_V1);
   const [delProfileAttribute,
   ] = useMutation(PROFESSIONAL_PROFILE_ATTRIBUTES_DEL);
+  const professionalId = localStorage.getItem('professionalId') || '';
 
   // Delete cards in backend
   const sendDeleteAttribute = (type: string, id: string) => {
@@ -378,7 +392,11 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
     setSpecialty(props.data.specialty ? props.data.specialty : '');
     setInstitution(props.data.institutions ? props.data.institutions : '');
     setBirthDate(props.data.birthDay ? new Date(props.data.birthDay) : new Date());
-    setContactInfo(props.data.contactInfo ? props.data.contactInfo : defaultContactInfo);
+    setContactInfo(
+      (
+        props.data.contactInfo.phone && props.data.contactInfo.address
+      ) ? props.data.contactInfo : defaultContactInfo,
+    );
     setYearsExperience(props.data.yearsExperience ? props.data.yearsExperience : '');
     setTechKnowledge(props.data.technicalKnowledge ? props.data.technicalKnowledge : '');
     setLastName(props.data.firstSurname ? props.data.firstSurname : '');
@@ -558,23 +576,6 @@ function ProfessionalProfileView(props: ProfessionalProfileData) : JSX.Element {
                       name="birth"
                       variant="filled"
                       type="date"
-                    />
-                  </div>
-                  <div>
-                    Correo electrónico:
-                    <TextField
-                      margin="dense"
-                      fullWidth
-                      onChange={(c) => {
-                        setContactInfo({
-                          ...contactInfo,
-                          email: c.target.value,
-                        });
-                      }}
-                      id="email"
-                      name="email"
-                      variant="filled"
-                      value={contactInfo.email}
                     />
                   </div>
                   <div>

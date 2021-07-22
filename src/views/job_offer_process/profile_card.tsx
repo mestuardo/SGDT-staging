@@ -33,7 +33,7 @@ export default function ProfileCard(props: ProfileCardProps) : JSX.Element {
 
   const { data: professionalsData, loading, error } = useQuery<ProfessionalData>(
     GET_PROFESSIONAL, {
-      variables: { getProfessionalProfessionalId: application.professionalId },
+      variables: { getProfessionalID: application.professionalId },
     },
   );
 
@@ -58,7 +58,6 @@ export default function ProfileCard(props: ProfileCardProps) : JSX.Element {
   const { professional }: {
     professional: GetProfessionalType
   } = professionalsData as ProfessionalData;
-
   const setDialogContent = () => {
     handleOpenDialog(application.professionalId, application, professional);
   };

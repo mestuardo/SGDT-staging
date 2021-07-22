@@ -57,12 +57,15 @@ const postedAppCardStyles = makeStyles((theme) => ({
     placeContent: 'center',
     borderRadius: 0,
   },
-
-  accordionHeading: {
-    textAlign: 'center',
-    margin: '5px auto',
+  JobOfferHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '90%',
+    margin: 'auto 50px',
+    alignItems: 'center',
     '@media only screen and (max-width: 768px)': {
-      fontSize: 'medium',
+      display: 'grid',
+      textAlign: 'center',
     },
   },
   GridListTile: {
@@ -70,7 +73,7 @@ const postedAppCardStyles = makeStyles((theme) => ({
     justifyContent: 'center',
   },
   YgridList: {
-    minHeight: theme.spacing(56),
+    minHeight: theme.spacing(60),
     maxHeight: theme.spacing(60),
     textAlign: 'center',
     overflowY: 'auto',
@@ -95,7 +98,7 @@ const postedAppCardStyles = makeStyles((theme) => ({
     alignItems: 'center',
   },
   stepperLabel: {
-    fontSize: '11px',
+    fontSize: '12px',
   },
 }));
 

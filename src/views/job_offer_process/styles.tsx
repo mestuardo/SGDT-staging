@@ -10,6 +10,7 @@ import { green } from '@material-ui/core/colors';
 export const jobOfferDetailStyles = makeStyles((theme) => ({
   root: {
     margin: 'auto',
+    textAlign: 'center',
   },
   avatar: {
     margin: 'auto',
@@ -32,7 +33,7 @@ export const jobOfferDetailStyles = makeStyles((theme) => ({
   detailBody: {
     textAlign: 'left',
     padding: theme.spacing(4),
-    height: '250px',
+    height: '300px',
     '@media only screen and (max-width: 600px)': {
       padding: 0,
       height: '200px',
@@ -145,7 +146,7 @@ export const recruitmentProcessStepperStyles = makeStyles((theme: Theme) => crea
   },
   // Vertical grid style
   YgridList: {
-    height: theme.spacing(40),
+    height: theme.spacing(46),
     // Here the scrollbar is stylized
     '&::-webkit-scrollbar': {
       width: 10,

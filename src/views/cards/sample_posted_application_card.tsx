@@ -18,11 +18,11 @@ import statusColor from './helpers';
 
 interface JobOfferCardProps{
   jobOffer: JobOfferSummaryType,
-  SLA_1: Date|null,
+  SLA_2: Date|null,
 }
 
 export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Element {
-  const { jobOffer, SLA_1 } = props;
+  const { jobOffer, SLA_2 } = props;
   const classes = postedApplicationCardStyles();
 
   const getSLADaysLeft = () => {
@@ -36,12 +36,12 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
 
       return Math.floor((utc2 - utc1) / MS_PER_DAY);
     }
-    if (SLA_1) {
-      const SLAdaysLeft = dateDiffInDays(new Date(), SLA_1);
-      if ((SLAdaysLeft <= 15) && (SLAdaysLeft > 5)) {
+    if (SLA_2) {
+      const SLAdaysLeft = dateDiffInDays(new Date(), SLA_2);
+      if ((SLAdaysLeft <= 4) && (SLAdaysLeft > 2)) {
         return 'MID';
       }
-      if (SLAdaysLeft > 15) {
+      if (SLAdaysLeft > 4) {
         return 'FAR';
       }
     }
@@ -78,9 +78,9 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
           {jobOffer.recruiter}
         </Typography>
         <Typography variant="caption" component="div">
-          <Box fontWeight="fontWeightMedium" display="inline">SLA Inicio:</Box>
+          <Box fontWeight="fontWeightMedium" display="inline">SLA Fin:</Box>
           {' '}
-          {SLA_1 ? SLA_1.toLocaleDateString() : null}
+          {SLA_2 ? SLA_2.toLocaleDateString() : null}
         </Typography>
         <Typography variant="caption" component="div">
           <Box fontWeight="fontWeightMedium" display="inline">Vacantes:</Box>

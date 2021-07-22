@@ -19,11 +19,13 @@ import ViewQuiltIcon from '@material-ui/icons/ViewQuilt';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuIcon from '@material-ui/icons/Menu';
+import FaceIcon from '@material-ui/icons/Face';
 import { useTheme } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useKeycloak } from '@react-keycloak/ssr';
 import type { KeycloakInstance } from 'keycloak-js';
+import { userIsProfessional, checkIfAllowed } from '../helpers/roles';
 
 import drawerStyles from './styles';
 import ParsedTokenType from '../types/keycloak-token-type';
@@ -43,39 +45,89 @@ export default function ClippedDrawer(props: Props): JSX.Element {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-  const redirectToIndex = () => router.push('/login');
-  const redirectToPersonnelRequest = () => router.push('/personnel-request');
-  const redirectToRecruitMentProcess = () => router.push('/recruitment-process');
+  const redirectTo = (path: string) => router.push(path);
   const handleLogOut = () => {
     if (keycloak) {
       window.location.href = keycloak.createLogoutUrl({ redirectUri: window.location.origin });
     }
   };
-  const buttonsArray = [{
+  const handleButtonColor = (pathname: string) => {
+    if (process.browser) {
+      if ((window.location.pathname === pathname) && (pathname === '/')) {
+        return true;
+      } if (window.location.pathname.includes(pathname) && (pathname !== '/')) {
+        return true;
+      }
+    }
+    return false;
+  };
+  const isProfessional = parsedToken && userIsProfessional(parsedToken);
+  const isRecruiterChief = parsedToken && checkIfAllowed(parsedToken, ['recruiterChief']);
+
+  const recruiterButtonsArray = [{
     key: 'incio',
     label: 'Inicio',
-    func: redirectToIndex,
+    pathname: '/',
+    icon: <HomeIcon />,
+  },
+  {
+    key: 'recruitment-process',
+    label: 'Solicitudes',
+    pathname: '/recruitment-process',
+    icon: <ViewQuiltIcon />,
+  },
+  ];
+
+  const recruiterChiefButtonsArray = [{
+    key: 'incio',
+    label: 'Inicio',
+    pathname: '/login',
     icon: <HomeIcon />,
   },
   {
     key: 'personnel-request',
-    label: 'Crear solicitud',
-    func: redirectToPersonnelRequest,
+    label: 'Nueva solicitud',
+    pathname: '/personnel-request',
     icon: <AssignmentIcon />,
   },
   {
     key: 'recruitment-process',
-    label: 'Procesos activos',
-    func: redirectToRecruitMentProcess,
+    label: 'Solicitudes',
+    pathname: '/recruitment-process',
     icon: <ViewQuiltIcon />,
   },
   ];
+
+  const professionalButtonsArray = [
+    {
+      key: 'ofertas',
+      label: 'Ofertas',
+      pathname: '/offers-list',
+      icon: <HomeIcon />,
+    },
+    {
+      key: 'perfil',
+      label: 'Mi Perfil',
+      pathname: '/professional-profile',
+      icon: <FaceIcon />,
+    },
+  ];
+
+  const recruitButtons = isRecruiterChief ? recruiterChiefButtonsArray : recruiterButtonsArray;
+  const buttonsArray = isProfessional ? professionalButtonsArray : recruitButtons;
+
   const drawerContent = (
     <div className={classes.drawerContainer}>
-
+      <div style={{ textAlign: 'center' }}>{parsedToken?.given_name}</div>
+      <Divider />
       <List>
         {buttonsArray.map((btn) => (
-          <ListItem button key={btn.key} onClick={btn.func}>
+          <ListItem
+            button
+            key={btn.key}
+            onClick={() => redirectTo(btn.pathname)}
+            selected={handleButtonColor(btn.pathname)}
+          >
             <ListItemIcon>{btn.icon}</ListItemIcon>
             <ListItemText primary={btn.label} />
           </ListItem>
@@ -86,7 +138,7 @@ export default function ClippedDrawer(props: Props): JSX.Element {
         <ListItem button onClick={handleLogOut}>
           <ListItemIcon>
             <ExitToAppIcon />
-            {' '}
+
           </ListItemIcon>
           <ListItemText primary="Cerrar sesión" />
         </ListItem>
@@ -116,16 +168,19 @@ export default function ClippedDrawer(props: Props): JSX.Element {
           </div>
           {keycloak?.authenticated || (keycloak && parsedToken) ? (
             <>
-              <IconButton
-                className={classes.iconStyle}
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                color="inherit"
-                onClick={() => router.push('/professional-profile')}
-              >
-                <AccountCircle />
-              </IconButton>
+              {isProfessional
+                ? (
+                  <IconButton
+                    className={classes.iconStyle}
+                    aria-label="account of current user"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    color="inherit"
+                    onClick={() => router.push('/professional-profile')}
+                  >
+                    <AccountCircle />
+                  </IconButton>
+                ) : null}
               <Hidden lgUp>
                 <IconButton
                   color="inherit"

@@ -10,6 +10,8 @@ import { JobOfferDetailType } from '../../src/types/job-offer-query-types';
 import JOB_OFFER_DETAILS from '../../src/queries/job-offer-details.graphql';
 import LoginWaitingRoom from '../../src/login_waiting_room';
 import PostedAppDetail from '../../src/views/posted_app_card_details';
+import { userIsProfessional } from '../../src/helpers/roles';
+import NotAllowedView from '../../src/views/not_allowed';
 
 interface JobOfferQueryData {
   jobOffer: JobOfferDetailType,
@@ -19,6 +21,7 @@ export default function Index():JSX.Element {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   // The token received by keycloak with the data
   const parsedToken = keycloak?.tokenParsed as ParsedTokenType;
+  const isProfessional = parsedToken && userIsProfessional(parsedToken);
 
   const router = useRouter();
   const { reqId } = router.query;
@@ -42,9 +45,13 @@ export default function Index():JSX.Element {
     if (JobOfferError) {
       return <div>Ha ocurrido un error</div>;
     }
+    if (isProfessional) {
+      return <NotAllowedView />;
+    }
 
     return (
       <>
+        {/* devolver nada si no se es algo aparte de profesional */}
         {(!JobOfferLoading && JobOfferData && !router.isFallback)
           ? (
             <PostedAppDetail

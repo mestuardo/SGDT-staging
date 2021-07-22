@@ -4,22 +4,22 @@ const useQontoStepIconStyles = makeStyles({
   root: {
     color: '#eaeaf0',
     display: 'flex',
-    height: 5,
+    height: 0,
     alignItems: 'center',
   },
   active: {
     color: '#784af4',
   },
   circle: {
-    width: 8,
-    height: 8,
+    width: 10,
+    height: 10,
     borderRadius: '50%',
     backgroundColor: 'currentColor',
   },
   completed: {
     color: '#784af4',
     zIndex: 1,
-    fontSize: 18,
+    fontSize: 22,
   },
 });
 

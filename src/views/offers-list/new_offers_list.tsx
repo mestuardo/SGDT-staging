@@ -13,7 +13,6 @@ import recruiterViewStyles from '../recruiter_view/styles';
 import getCols from '../../helpers/get_columns_helper';
 import { ProfessionalJobOfferDetail } from '../../types/job-offer-query-types';
 import ApplyOfferDialog from './apply_offer_dialog';
-import professionalId from '../../global-variables';
 
 interface NewOffersListProps {
   width: Breakpoint,
@@ -57,7 +56,7 @@ function NewOffersList(props: NewOffersListProps) {
   } = useQuery<SavedJobOffersDataType>(SAVED_JOB_OFFERS_IDS, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'network-only',
-    variables: { getSavedJobOffersProfessionalId: professionalId },
+    variables: { getSavedJobOffersProfessionalId: localStorage.getItem('professionalId') },
   });
 
   const {
@@ -65,7 +64,7 @@ function NewOffersList(props: NewOffersListProps) {
   } = useQuery<AppliedJobOffersDataType>(APPLIED_JOB_OFFERS_IDS, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'network-only',
-    variables: { getAppliedJobOffersProfessionalId: professionalId },
+    variables: { getAppliedJobOffersProfessionalId: localStorage.getItem('professionalId') },
   });
 
   const classes = recruiterViewStyles();

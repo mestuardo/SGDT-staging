@@ -32,7 +32,7 @@ export interface RequestDetailType {
   requestDescription: string,
   recruiter:string,
   levelOfStudies: string,
-  languages: { language: string, level: string }[],
+  languages: { language: string, level: string, type: string }[],
   maxSalary:number
   formationStatus: string,
   softSkills: Array<string>,

@@ -40,7 +40,7 @@ export default function ApplicantCard(props:RequestCardProps) : JSX.Element {
         disableTypography
       />
 
-      <CardContent className={classes.cardContent} onClick={redirectToReview}>
+      <CardContent data-testid="request-card-area" className={classes.cardContent} onClick={redirectToReview}>
         <Typography variant="caption" component="div">
           <Box fontWeight="fontWeightMedium" display="inline">Cliente:</Box>
           {' '}

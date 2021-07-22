@@ -8,6 +8,7 @@ query Query($getRequestId: ID!) {
     formationStatus
     recruiter
     approxStartDate
+    requestCreationDate
     possibleDuration
     requestDescription
     levelOfStudies
@@ -15,6 +16,7 @@ query Query($getRequestId: ID!) {
     languages {
       language
       level
+      type
     }
     maxSalary
     softSkills

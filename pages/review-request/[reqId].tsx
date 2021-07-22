@@ -11,6 +11,8 @@ import { RequestDetailType } from '../../src/types/request-query-types';
 import REQUEST_DETAILS from '../../src/queries/request-details.graphql';
 import LoginWaitingRoom from '../../src/login_waiting_room';
 import RequestReviewDetail from '../../src/views/request_review_detail';
+import { checkIfAllowed } from '../../src/helpers/roles';
+import NotAllowedView from '../../src/views/not_allowed';
 
 interface RequestData {
   request: RequestDetailType,
@@ -20,6 +22,7 @@ export default function Index(): JSX.Element {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   // The token received by keycloak with the data
   const parsedToken = keycloak?.tokenParsed as ParsedTokenType;
+  const isRecruiter = parsedToken && checkIfAllowed(parsedToken, ['recruiter', 'recruiterChief']);
   const router = useRouter();
   const { reqId } = router.query;
 
@@ -39,6 +42,9 @@ export default function Index(): JSX.Element {
   if (keycloak?.authenticated || (keycloak && parsedToken)) {
     if (error) {
       return <div>Ocurrió un error</div>;
+    }
+    if (!isRecruiter) {
+      return <NotAllowedView />;
     }
 
     return (

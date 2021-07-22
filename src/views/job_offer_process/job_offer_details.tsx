@@ -12,10 +12,14 @@ import {
 import {
   Cancel,
 } from '@material-ui/icons';
+import { useKeycloak } from '@react-keycloak/ssr';
+import type { KeycloakInstance } from 'keycloak-js';
 import { useMutation } from '@apollo/client';
 import { jobOfferDetailStyles } from './styles';
 import { JobOfferDetailType } from '../../types/job-offer-query-types';
 import { summaryLabels } from './helpers';
+import ParsedTokenType from '../../types/keycloak-token-type';
+import { checkIfAllowed } from '../../helpers/roles';
 import CLOSE_JOB_OFFER from '../../mutations/closeJobOffer.graphql';
 
 interface JobOfferDetailProps{
@@ -23,16 +27,22 @@ interface JobOfferDetailProps{
 }
 
 export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Element {
+  // Keycloak instance, recieves parameters from the provider
+  const { keycloak } = useKeycloak<KeycloakInstance>();
+  // The token received by keycloak with the data
+  const parsedToken = keycloak?.tokenParsed as ParsedTokenType;
   const { jobOffer } = props;
   const classes = jobOfferDetailStyles();
   const { questions } = jobOffer;
-  const redirectOnSubmit = () => { window.location.href = '/recruitment-process/'; };
+  const redirectOnSubmit = () => { window.location.href = '/recruitment-process?closedRequests=true'; };
   const [closeJobOffer,
     { loading: mutationLoading, error: mutationError }] = useMutation(CLOSE_JOB_OFFER);
 
+  const isRecruiterChief = parsedToken && checkIfAllowed(parsedToken, ['recruiterChief']);
   const [showCloseJobOffer, setShowCloseJobOffer] = React.useState(false);
   const [showCloseJobOfferMessage, setShowCloseJobOfferMessage] = React.useState(false);
   const [closeJobOfferMessage, setCloseJobOfferMessage] = React.useState('');
+
   const handleCloseJobOffer = () => {
     closeJobOffer({
       variables: {
@@ -56,10 +66,16 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
       className={classes.root}
     >
       <Grid item xs={12}>
+        <hr />
         <Typography variant="body1" component="h6">
           <Box fontWeight="fontWeightMedium" display="inline">Cliente:</Box>
           {' '}
           {jobOffer.client}
+        </Typography>
+        <Typography variant="body1" component="h6">
+          <Box fontWeight="fontWeightMedium" display="inline">Reclutador:</Box>
+          {' '}
+          {jobOffer.recruiter}
         </Typography>
         <hr />
       </Grid>
@@ -112,7 +128,10 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
           <Typography variant="body1" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Idiomas:</Box>
             {' '}
-            {jobOffer.languages ? jobOffer.languages.map((entry:{ language:string }) => `${entry.language}`).join('; ') : '-'}
+            {jobOffer.languages ? jobOffer.languages.map(
+              (entry:
+              { language: string, level: string, type: string }) => `${entry.language},${entry.level},${entry.type}`,
+            ).join('; ') : '-'}
           </Typography>
           <Typography variant="body1" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Requisitios técnicos:</Box>
@@ -143,7 +162,7 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
           <Typography variant="body1" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Fecha de ingreso:</Box>
             {' '}
-            {new Date(jobOffer.approxStartDate).toLocaleDateString() || '-'}
+            {jobOffer.approxStartDate ? new Date(jobOffer.approxStartDate).toLocaleDateString() : '-'}
           </Typography>
           <Typography variant="body1" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Tipo de servicio:</Box>
@@ -199,7 +218,8 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
           <Button
             color="primary"
             variant="outlined"
-            disabled={mutationLoading || (!!jobOffer.closeMessage)}
+            // deshabilitar si user no es recruiterChief
+            disabled={(mutationLoading || (!!jobOffer.closeMessage)) || !isRecruiterChief}
             onClick={() => setShowCloseJobOffer((o) => !o)}
           >
             Cerrar proceso

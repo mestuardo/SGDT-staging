@@ -70,8 +70,7 @@ export default function SignIn(props: FormProps): JSX.Element {
     return (
       <>
         <p>Solicitud enviada</p>
-        <Button variant="contained" href="/recruitment-process" className={classes.button}> Ir a procesos activos</Button>
-        <Button variant="contained" href="/personnel-request" className={classes.button}> Crear nueva solicitud</Button>
+        <Button variant="contained" href="/recruitment-process?newRequests=true" className={classes.button}> Ir a solicitudes creadas</Button>
       </>
     );
   };
@@ -258,7 +257,7 @@ export default function SignIn(props: FormProps): JSX.Element {
             onClick={handleSubmit}
             className={classes.button}
           >
-            {activeStep >= steps.length - 1 ? 'Enviar' : 'Siguiente'}
+            {activeStep >= steps.length - 1 ? 'Crear' : 'Continuar'}
           </Button>
         </div>
       </Grid>

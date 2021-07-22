@@ -5,7 +5,7 @@ import { useMutation, DocumentNode } from '@apollo/client';
 import { Button, TextField } from '@material-ui/core';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CancelIcon from '@material-ui/icons/Cancel';
-
+import { checkIfAllowed } from '../../helpers/roles';
 import ParsedTokenType from '../../types/keycloak-token-type';
 import CREATE_NEW_MESSAGE from '../../mutations/create-message.graphql';
 import JOB_OFFER_DETAILS from '../../queries/job-offer-details.graphql';
@@ -20,6 +20,7 @@ export default function NewMessageCard(props: NewMessageCardProps): JSX.Element 
   const { keycloak } = useKeycloak<KeycloakInstance>();
   // The token received by keycloak with the data
   const parsedToken = keycloak?.tokenParsed as ParsedTokenType;
+  const isRecruiter = parsedToken && checkIfAllowed(parsedToken, ['recruiter']);
 
   const [createMessage,
     { loading: createMessageLoading, error: createMessageError }] = useMutation(CREATE_NEW_MESSAGE);
@@ -30,7 +31,7 @@ export default function NewMessageCard(props: NewMessageCardProps): JSX.Element 
         jobOfferId,
         messageBody: msg,
         senderName: `${parsedToken.given_name} ${parsedToken.family_name}`,
-        senderOptions: 'RECRUITER',
+        senderOptions: isRecruiter ? 'RECRUITER' : 'COMMERCIAL_AREA',
       },
       refetchQueries: [{
         query: JOB_OFFER_DETAILS as DocumentNode,

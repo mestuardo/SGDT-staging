@@ -1,5 +1,5 @@
-query Query($getProfessionalProfessionalId: ID!) {
-  professional: getProfessional(professionalId: $getProfessionalProfessionalId) {
+query Query($getProfessionalID: ID!) {
+  professional: getProfessional(professionalId: $getProfessionalID) {
     id
     name
     firstSurname

@@ -9,7 +9,10 @@ import GET_PROFESSIONAL_PROFILE_QUERY from '../queries/get-professional-profile.
 import {
   ProfessionalProfileData,
 } from '../types/get-professional-profile-types';
-import professionalId from '../global-variables';
+
+interface ProfileQuery {
+  getCurrentProfessional: ProfessionalProfileData
+}
 
 export default function StateDropDown(): JSX.Element {
   const [value, setValue] = React.useState<string>('');
@@ -17,11 +20,8 @@ export default function StateDropDown(): JSX.Element {
   // Query
   const {
     loading, data,
-  } = useQuery<ProfessionalProfileData>(GET_PROFESSIONAL_PROFILE_QUERY, {
+  } = useQuery<ProfileQuery>(GET_PROFESSIONAL_PROFILE_QUERY, {
     notifyOnNetworkStatusChange: true,
-    variables: {
-      getProfessionalProfessionalId: professionalId,
-    },
   });
 
   // Mutations
@@ -30,14 +30,14 @@ export default function StateDropDown(): JSX.Element {
 
   React.useEffect(() => {
     if (!loading && data) {
-      setValue(data.data?.state ? data.data.state : 'AVAILABLE');
+      setValue(data.getCurrentProfessional.state ? data.getCurrentProfessional.state : 'AVAILABLE');
     }
   }, []);
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setValue(event.target.value as string);
     const variables = {
-      editProfessionalProfessionalId: professionalId,
+      editProfessionalProfessionalId: localStorage.getItem('professionalId'),
       editProfessionalInput: {
         state: event.target.value,
       },

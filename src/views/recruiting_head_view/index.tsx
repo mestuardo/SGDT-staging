@@ -96,7 +96,7 @@ export default function RecruitingHeadView() : JSX.Element {
             onChange={handleChange}
             aria-label="Horizontal tabs"
           >
-            <Tab label="Crear solicitud" id={assignIdToTab(0).id} aria-controls={assignIdToTab(0)['aria-controls']} />
+            <Tab label="Nueva solicitud" id={assignIdToTab(0).id} aria-controls={assignIdToTab(0)['aria-controls']} />
 
           </Tabs>
         </div>

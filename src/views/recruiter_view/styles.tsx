@@ -1,4 +1,7 @@
 import { makeStyles } from '@material-ui/core/styles';
+import {
+  red,
+} from '@material-ui/core/colors';
 
 const recruiterViewStyles = makeStyles((theme) => ({
   gridContainer: {
@@ -85,6 +88,32 @@ const recruiterViewStyles = makeStyles((theme) => ({
       placeItems: 'center',
 
     },
+  },
+  avatar: {
+    width: theme.spacing(4),
+    height: theme.spacing(4),
+    margin: theme.spacing(1),
+    backgroundColor: red[200],
+  },
+  icon: {
+    color: '#fff',
+  },
+  badgeDefault: {
+    marginRight: theme.spacing(2),
+    color: 'white',
+    backgroundColor: 'red',
+  },
+  badgeAccepted: {
+    color: 'white',
+    backgroundColor: 'green',
+  },
+  badgePsy: {
+    color: 'black',
+    backgroundColor: 'orange',
+  },
+  badgeTech: {
+    color: 'white',
+    backgroundColor: 'blue',
   },
 
 }));

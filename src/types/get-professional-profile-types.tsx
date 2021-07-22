@@ -57,6 +57,7 @@ interface ContactInfo {
 }
 
 export interface ProfileData {
+  id: string,
   profile: string,
   career: string,
   name: string,
@@ -78,4 +79,5 @@ export interface ProfileData {
 
 export interface ProfessionalProfileData {
   data: ProfileData
+  state?: string
 }

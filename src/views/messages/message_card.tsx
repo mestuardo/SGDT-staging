@@ -32,7 +32,7 @@ export default function MessageCard(props: MessageCardProps) : JSX.Element {
           <Box fontWeight="fontWeightMedium" display="inline">{`${message.senderOptions === 'RECRUITER' ? 'Reclutador ' : 'Área comercial'} `}</Box>
         </Typography>
         <Typography variant="caption" component="div">
-          {new Date(message.createdAt).toLocaleDateString()}
+          {new Date(message.createdAt).toLocaleString()}
         </Typography>
         <Typography style={{ textAlign: 'left' }} variant="caption" component="div">
           {message.message}

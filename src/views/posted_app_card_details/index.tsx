@@ -1,13 +1,9 @@
 import React, { SetStateAction } from 'react';
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Step,
   Stepper,
   StepLabel,
   Badge,
-  Box,
   CircularProgress,
   Grid,
   GridList,
@@ -24,7 +20,6 @@ import {
   ToggleButtonGroup,
 } from '@material-ui/lab';
 import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useQuery } from '@apollo/client';
 import { QontoStepIcon, QontoConnector } from './QontoStepIcon';
 import postedAppCardStyles from './styles';
@@ -108,6 +103,12 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
   };
 
   const [activeStep, setActiveStep] = React.useState(1);
+  const TitleSteps = ['Creación de solicitud',
+    'Publicado',
+    'Selección de candidatos',
+    'Entrevistas',
+    'Cerrado',
+  ];
   const steps = [
     {
       key: 'REQUEST',
@@ -129,11 +130,16 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
     },
     {
       key: 'WAIT_CANDIDATES',
-      value: 'Esperando candidatos',
+      value: (
+        <>
+          <div>{new Date(jobOfferData.jobOfferCreationDate).toLocaleDateString()}</div>
+          {' '}
+          <div>Selección de candidatos</div>
+        </>),
     },
     {
       key: 'EVAL_CANDIDATES',
-      value: 'Evaluando candidatos',
+      value: 'Entrevistas',
     },
     {
       key: 'CLOSED',
@@ -155,11 +161,24 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
     if (jobOfferData.closeMessage) {
       return setActiveStep(4);
     }
-    if (candidates.length > 0) {
+    const interviewCandidates = candidates.filter(
+      (application: FilterApplicationsType) => (
+        application.stage !== 'PRE_INTERVIEW'
+      ),
+    );
+    const preInterviewCandidates = candidates.filter(
+      (application: FilterApplicationsType) => (
+        application.stage === 'PRE_INTERVIEW'
+      ),
+    );
+    if (interviewCandidates.length > 0) {
       return setActiveStep(3);
     }
+    if (preInterviewCandidates.length > 0) {
+      return setActiveStep(2);
+    }
 
-    return setActiveStep(2);
+    return setActiveStep(1);
   }, [candidates]);
   React.useEffect(() => setCurrentApplication(initApplication),
 
@@ -220,11 +239,21 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
         lg={8}
         component={Paper}
       >
-        <Typography className={classes.accordionHeading} variant="h6" component="div">
-          <Box fontWeight="fontWeightBold">
-            {`Oferta ${jobOfferData.position}`}
-          </Box>
-        </Typography>
+        <div className={classes.JobOfferHeader}>
+          <Typography variant="h6">
+            {`Solicitud ${jobOfferData.closeMessage ? 'Cerrada' : 'Publicada'} ${jobOfferData.position}`}
+          </Typography>
+          <div
+            style={{
+              color: jobOfferData.closeMessage ? 'red' : 'green',
+              fontWeight: 'bold',
+            }}
+          >
+            Estado proceso:
+            {' '}
+            {jobOfferData.closeMessage ? 'CERRADO' : TitleSteps[activeStep].toUpperCase()}
+          </div>
+        </div>
         <Paper className={classes.horizontalTabs}>
           <Tabs
             orientation="horizontal"
@@ -233,99 +262,78 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
             value={value}
             onChange={handleChange}
             aria-label="Horizontal tabs"
+
           >
+            <Tab
+              label="Resumen"
+              id={assignIdToTab(0).id}
+              aria-controls={assignIdToTab(1)['aria-controls']}
+            />
             {jobOfferData.closeMessage ? null : (
               <Tab
                 label={<Badge badgeContent={newApplications.length} color="primary">Postulantes</Badge>}
-                id={assignIdToTab(0).id}
-                aria-controls={assignIdToTab(0)['aria-controls']}
+                id={assignIdToTab(1).id}
+                aria-controls={assignIdToTab(1)['aria-controls']}
               />
             )}
             <Tab
               label={<Badge badgeContent={candidates.length} color="primary">Candidatos</Badge>}
-              id={assignIdToTab(1).id}
-              aria-controls={assignIdToTab(1)['aria-controls']}
+              id={assignIdToTab(2).id}
+              aria-controls={assignIdToTab(2)['aria-controls']}
             />
 
             <Tab
               label={<Badge badgeContent={rejectedApplications.length} color="error">Candidatos rechazados</Badge>}
-              id={assignIdToTab(2).id}
-              aria-controls={assignIdToTab(2)['aria-controls']}
+              id={assignIdToTab(3).id}
+              aria-controls={assignIdToTab(3)['aria-controls']}
             />
             <Tab
               label="Mensajes"
-              id={assignIdToTab(3).id}
-              aria-controls={assignIdToTab(3)['aria-controls']}
+              id={assignIdToTab(4).id}
+              aria-controls={assignIdToTab(4)['aria-controls']}
             />
           </Tabs>
 
         </Paper>
-        <div style={{ margin: 'auto', textAlign: 'center' }}>
 
-          <Stepper
-            alternativeLabel
-            activeStep={activeStep}
-            connector={<QontoConnector />}
-          >
-            {steps.map((label) => (
-              <Step key={label.key}>
+        <TabPanel tabValue={value} index={0}>
 
-                <StepLabel
-                  classes={{ label: classes.stepperLabel }}
-                  StepIconComponent={QontoStepIcon}
-                >
-                  <Hidden smDown>{label.value}</Hidden>
-                </StepLabel>
+          <div style={{ margin: 'auto', textAlign: 'center' }}>
 
-              </Step>
-            ))}
-          </Stepper>
-          <Hidden mdUp>
-            <Typography
-              variant="body2"
+            <Stepper
+              alternativeLabel
+              activeStep={activeStep}
+              connector={<QontoConnector />}
             >
-              {steps[activeStep].value}
+              {steps.map((label) => (
+                <Step key={label.key}>
 
-            </Typography>
-          </Hidden>
-          <Typography
-            style={{
-              color: jobOfferData.closeMessage ? 'red' : 'green',
-              fontWeight: 'bold',
-            }}
-            variant="caption"
-            component="h6"
-          >
-            Estado proceso:
-            {' '}
-            {jobOfferData.closeMessage ? 'CERRADO' : 'ABIERTO'}
-          </Typography>
-        </div>
-        <Paper className={classes.accordionPaper}>
-          <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
-            >
+                  <StepLabel
+                    classes={{ label: classes.stepperLabel }}
+                    StepIconComponent={QontoStepIcon}
+                  >
+                    <Hidden smDown>{label.value}</Hidden>
+                  </StepLabel>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', width: '100%' }}>
-                <Typography variant="h6" component="h6">
-                  Detalles
-                </Typography>
-                <Typography variant="h6" component="h6">
-                  Acciones
-                </Typography>
-              </div>
+                </Step>
+              ))}
+            </Stepper>
+            <Hidden mdUp>
+              <Typography
+                variant="body2"
+              >
+                {steps[activeStep].value}
 
-            </AccordionSummary>
-            <AccordionDetails style={{ margin: 'auto' }}>
-              <JobOfferDetails jobOffer={jobOfferData} />
-            </AccordionDetails>
-          </Accordion>
-        </Paper>
+              </Typography>
+            </Hidden>
+
+          </div>
+          <JobOfferDetails jobOffer={jobOfferData} />
+
+        </TabPanel>
+
         {jobOfferData.closeMessage ? null : (
-          <TabPanel tabValue={value} index={0}>
+          <TabPanel tabValue={value} index={1}>
             <ToggleButtonGroup
               style={{ width: 180, height: 30 }}
               value={applicationsSortBy}
@@ -335,14 +343,14 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
               aria-label="cards filter"
             >
               <ToggleButton
-                onClick={filterAppsDateDesc}
+                onClick={filterAppsDateAsc}
                 value="DATE-DESC"
                 aria-label="Descendant date filtered"
               >
                 Recientes
               </ToggleButton>
               <ToggleButton
-                onClick={filterAppsDateAsc}
+                onClick={filterAppsDateDesc}
                 value="DATE-ASC"
                 aria-label="Ascendant date filtered"
               >
@@ -351,7 +359,7 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
               </ToggleButton>
 
             </ToggleButtonGroup>
-            <GridList cellHeight="auto" cols={cols} className={classes.YgridList} style={{ margin: 'auto' }}>
+            <GridList cellHeight="auto" cols={cols} className={classes.YgridList} style={{ margin: 'auto', minHeight: '450px' }}>
               {newApplications.length > 0 ? (
                 newApplications.map((newApp) => (
                   <GridListTile key={newApp.id} className={classes.GridListTile}>
@@ -372,7 +380,7 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
             </GridList>
           </TabPanel>
         )}
-        <TabPanel tabValue={value} index={jobOfferData.closeMessage ? 0 : 1}>
+        <TabPanel tabValue={value} index={jobOfferData.closeMessage ? 1 : 2}>
 
           {error && (
           <div style={{ margin: 'auto' }}>
@@ -389,7 +397,7 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
 
         </TabPanel>
 
-        <TabPanel tabValue={value} index={jobOfferData.closeMessage ? 1 : 2}>
+        <TabPanel tabValue={value} index={jobOfferData.closeMessage ? 2 : 3}>
           <GridList cellHeight="auto" cols={cols} className={classes.YgridList} style={{ margin: 'auto' }}>
             {rejectedApplications.length > 0 ? (
               rejectedApplications.map((newApp) => (
@@ -411,20 +419,22 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
           </GridList>
         </TabPanel>
 
-        <TabPanel tabValue={value} index={jobOfferData.closeMessage ? 2 : 3}>
-          <GridList cellHeight="auto" cols={1} className={classes.YgridList} style={{ margin: 'auto' }}>
-            {jobOfferData.messages.map((currentMessage) => (
-              <GridListTile
-                key={currentMessage.senderName}
-                className={classes.GridListTile}
-                style={{ justifyContent: currentMessage.senderOptions === 'RECRUITER' ? 'right' : 'left' }}
-              >
-                <MessageCard
+        <TabPanel tabValue={value} index={jobOfferData.closeMessage ? 3 : 4}>
+          <GridList cellHeight="auto" cols={1} className={classes.YgridList} style={{ margin: 'auto', minHeight: '340px', height: '340px' }}>
+            {jobOfferData.messages.length > 0 ? (
+              jobOfferData.messages.map((currentMessage) => (
+                <GridListTile
                   key={currentMessage.senderName}
-                  message={currentMessage}
-                />
-              </GridListTile>
-            ))}
+                  className={classes.GridListTile}
+                  style={{ justifyContent: currentMessage.senderOptions === 'RECRUITER' ? 'right' : 'left' }}
+                >
+                  <MessageCard
+                    key={currentMessage.senderName}
+                    message={currentMessage}
+                  />
+                </GridListTile>
+              ))
+            ) : ''}
           </GridList>
           <NewMessageCard
             jobOfferId={jobOfferData.id}
@@ -445,7 +455,7 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
             justifyContent: 'center',
             textAlign: 'center',
             placeItems: 'center',
-            margin: '10px',
+            margin: '15px',
           }}
           >
             <Typography variant="h6">

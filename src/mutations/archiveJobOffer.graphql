@@ -1,0 +1,5 @@
+mutation ArchiveJobOfferMutation($archiveJobOfferJobOfferId: ID!) {
+  archiveJobOffer(jobOfferId: $archiveJobOfferJobOfferId) {
+    id
+  }
+}

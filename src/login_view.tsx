@@ -12,6 +12,7 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import { useKeycloak } from '@react-keycloak/ssr';
 import type { KeycloakInstance } from 'keycloak-js';
+import { checkIfAllowed, userIsProfessional } from './helpers/roles';
 
 import ParsedTokenType from './types/keycloak-token-type';
 
@@ -55,6 +56,56 @@ export default function LoginView() : JSX.Element {
   const router = useRouter();
   const handlePersonnelRequestRedirect = () => router.push('/personnel-request');
   const handleRecruitmentProcessRedirect = () => router.push('/recruitment-process');
+  const isRecruiterChief = parsedToken && checkIfAllowed(parsedToken, ['recruiterChief']);
+  const isProfessional = parsedToken && userIsProfessional(parsedToken);
+
+  if (isProfessional) {
+    return (
+      <Grid
+        container
+        className={classes.gridContainer}
+        justifyContent="center"
+        alignContent="center"
+        alignItems="center"
+        spacing={0}
+      >
+        <Grid
+          item
+          xs={12}
+          lg={8}
+          component={Paper}
+        >
+          <div className={classes.paper}>
+            <Avatar className={classes.avatar}>
+              <FaceIcon />
+            </Avatar>
+            <Typography gutterBottom component="h1" variant="h5">
+              {`¡Hola ${parsedToken?.given_name}!`}
+            </Typography>
+          </div>
+        </Grid>
+        <Hidden mdDown>
+          <Grid
+            item
+            md={3}
+            component={Paper}
+            className={classes.gridItem}
+          >
+
+            <div style={{
+              marginTop: '30px',
+              height: '575px',
+              display: 'grid',
+              justifyContent: 'center',
+              textAlign: 'center',
+              placeItems: 'center',
+            }}
+            />
+          </Grid>
+        </Hidden>
+      </Grid>
+    );
+  }
 
   return (
     <Grid
@@ -78,14 +129,19 @@ export default function LoginView() : JSX.Element {
           <Typography gutterBottom component="h1" variant="h5">
             {`¡Hola ${parsedToken?.given_name}!`}
           </Typography>
-          <Button
-            onClick={handlePersonnelRequestRedirect}
-            variant="contained"
-            color="secondary"
-            className={classes.button}
-          >
-            Nueva solicitud
-          </Button>
+          {/* mostrar botón solo si es jefe reclutador */}
+          {isRecruiterChief
+            ? (
+              <Button
+                onClick={handlePersonnelRequestRedirect}
+                variant="contained"
+                color="secondary"
+                className={classes.button}
+              >
+                Nueva solicitud
+              </Button>
+            )
+            : null }
           <Button
             onClick={handleRecruitmentProcessRedirect}
             variant="contained"

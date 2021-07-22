@@ -64,11 +64,11 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
       return 'CLOSED';
     }
 
-    const SLAdaysLeft = dateDiffInDays(new Date(), new Date(jobOffer.sla_start));
-    if ((SLAdaysLeft <= 15) && (SLAdaysLeft > 5)) {
+    const SLAdaysLeft = dateDiffInDays(new Date(), new Date(jobOffer.sla_end));
+    if ((SLAdaysLeft <= 4) && (SLAdaysLeft > 2)) {
       return 'MID';
     }
-    if (SLAdaysLeft > 15) {
+    if (SLAdaysLeft > 4) {
       return 'FAR';
     }
     return 'CLOSE';
@@ -86,6 +86,7 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
               colorSecondary: classes.badgePsy,
               colorError: classes.badgeTech,
             }}
+            data-testid="card-badge"
             color={(applicationsData && setBadgeColor(applicationsData.jobOfferApplications)) || 'default'}
             badgeContent={(applicationsData)
               ? applicationsData.jobOfferApplications.filter((application) => application.status !== 'REJECTED'
@@ -116,9 +117,9 @@ export default function PostedApplicationCard(props:JobOfferCardProps) : JSX.Ele
         </Typography>
         {jobOffer.closeMessage ? null : (
           <Typography variant="caption" component="div">
-            <Box fontWeight="fontWeightMedium" display="inline">SLA Inicio:</Box>
+            <Box fontWeight="fontWeightMedium" display="inline">SLA Fin:</Box>
             {' '}
-            {new Date(jobOffer.sla_start).toLocaleDateString()}
+            {new Date(jobOffer.sla_end).toLocaleDateString()}
           </Typography>
         ) }
         <Typography variant="caption" component="div">

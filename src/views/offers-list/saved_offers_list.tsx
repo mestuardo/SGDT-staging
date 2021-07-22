@@ -8,7 +8,6 @@ import OfferCard from '../cards/offer_card';
 import recruiterViewStyles from '../recruiter_view/styles';
 import getCols from '../../helpers/get_columns_helper';
 import { ProfessionalJobOfferDetail } from '../../types/job-offer-query-types';
-import professionalId from '../../global-variables';
 
 interface SavedOffersListProps {
   width: Breakpoint,
@@ -27,7 +26,7 @@ function SavedOffersList(props: SavedOffersListProps) {
   } = useQuery<SavedOffersDataType>(SAVED_JOB_OFFERS_OBJECTS, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'network-only',
-    variables: { getSavedJobOffersProfessionalId: professionalId },
+    variables: { getSavedJobOffersProfessionalId: localStorage.getItem('professionalId') },
   });
   const classes = recruiterViewStyles();
 

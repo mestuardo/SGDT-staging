@@ -2,6 +2,10 @@ import React from 'react';
 import {
   Box,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   CircularProgress,
   Grid,
   Hidden,
@@ -31,11 +35,16 @@ import {
 } from '@apollo/client';
 import { useRouter, NextRouter } from 'next/router';
 
+import { useKeycloak } from '@react-keycloak/ssr';
+import type { KeycloakInstance } from 'keycloak-js';
+import ParsedTokenType from '../../types/keycloak-token-type';
+import { checkIfAllowed } from '../../helpers/roles';
 import SamplePostedApplicationCard from '../cards/sample_posted_application_card';
 import requestReviewStyles from './styles';
 import { DescriptionAndQuestionsSchema, summaryLabels } from './helpers';
 import { RequestDetailType } from '../../types/request-query-types';
 import PUBLISH_JOB_OFFER from '../../mutations/createJobOffer.graphql';
+import ARCHIVE_JOB_OFFER from '../../mutations/archiveJobOffer.graphql';
 import RECRUITMENT_PROCESS_INDEX_QUERY from '../../queries/recruitment-process-index.graphql';
 
 interface RequestReviewDetailProps {
@@ -69,9 +78,17 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
   const { requestData } = props;
   const classes = requestReviewStyles();
   const router: NextRouter = useRouter();
+  const [openArchiveDialog, setOpenArchiveDialog] = React.useState(false);
+  const { keycloak } = useKeycloak<KeycloakInstance>();
+  // The token received by keycloak with the data
+  const parsedToken = keycloak?.tokenParsed as ParsedTokenType;
+  const isRecruiterChief = checkIfAllowed(parsedToken, ['recruiterChief']);
 
   const [publishJobOffer,
     { loading: mutationLoading, error: mutationError }] = useMutation(PUBLISH_JOB_OFFER);
+
+  const [archiveJobOffer,
+    { loading: archiveLoading, error: archiveError }] = useMutation(ARCHIVE_JOB_OFFER);
 
   const formRef = React.useRef<FormikProps<DescriptionAndQuestionsSchema>>(null);
 
@@ -88,9 +105,9 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
     }, 50);
   }, [questionQuantity]);
 
-  const redirectOnSubmit = () => router.push('/recruitment-process/');
+  const redirectOnSubmit = () => router.push('/recruitment-process?postedRequests=true');
 
-  const [SLA_1, setSLA1] = React.useState<Date|null>(null);
+  const [SLA_1, setSLA1] = React.useState<Date | null>(null);
   const [SLA_2, setSLA2] = React.useState<Date | null>(null);
   const [description, setDescription] = React.useState('');
   const [question1, setQuestion1] = React.useState('');
@@ -126,12 +143,12 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Salario máximo:</Box>
             {' $'}
-            {(+requestData.maxSalary).toLocaleString() || '-'}
+            {requestData.maxSalary ? (+requestData.maxSalary).toLocaleString() : '-'}
           </Typography>
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Años experiencia requeridos:</Box>
             {' '}
-            {`${requestData.yearsExperience} años` || '-'}
+            {requestData.yearsExperience ? `${requestData.yearsExperience} años` : '-'}
           </Typography>
 
           <Typography variant="caption" component="div">
@@ -147,13 +164,14 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Requisitios técnicos:</Box>
             {' '}
-            {requestData.technicalRequirements.map(
-              (
-                tec: { requirement: string, obligatoriness: string },
-              ) => (
-                `${tec.requirement}, ${summaryLabels[tec.obligatoriness] as string};`
-              ),
-            ) || '-'}
+            {requestData.technicalRequirements.length !== 0
+              ? requestData.technicalRequirements.map(
+                (
+                  tec: { requirement: string, obligatoriness: string },
+                ) => (
+                  `${tec.requirement}, ${summaryLabels[tec.obligatoriness] as string};`
+                ),
+              ) : '-'}
           </Typography>
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Nivel formación:</Box>
@@ -173,12 +191,12 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Requerimientos especiales:</Box>
             {' '}
-            {requestData.specialRequirements.toString().replace(',', ', ') || '-'}
+            {requestData.specialRequirements.length !== 0 ? requestData.specialRequirements.toString().replace(',', ', ') : '-'}
           </Typography>
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Fecha de ingreso:</Box>
             {' '}
-            {new Date(requestData.approxStartDate).toLocaleDateString() || '-'}
+            {requestData.approxStartDate ? new Date(requestData.approxStartDate).toLocaleDateString() : '-'}
           </Typography>
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Tipo de servicio:</Box>
@@ -188,7 +206,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Tipo de contrato:</Box>
             {' '}
-            {requestData.contractType[0] === -1 ? 'Indefinido' : 'Fijo' || '-'}
+            {requestData.contractType[0] === -1 ? 'Indefinido' : 'Fijo'}
           </Typography>
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Jornada laboral:</Box>
@@ -209,7 +227,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
           <Typography variant="caption" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Requiere computador:</Box>
             {' '}
-            {requestData.requiresComputer ? 'Sí' : 'No' || '-'}
+            {requestData.requiresComputer ? 'Sí' : 'No'}
           </Typography>
         </div>
         <Formik
@@ -258,6 +276,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
                   <KeyboardDatePicker
                     disablePast
                     margin="normal"
+                    data-testid="SLA_1"
                     id="SLA_1"
                     name="SLA_1"
                     cancelLabel="Cancelar"
@@ -284,6 +303,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
                   <KeyboardDatePicker
                     disablePast
                     margin="normal"
+                    data-testid="SLA_2"
                     id="SLA_2"
                     name="SLA_2"
                     cancelLabel="Cancelar"
@@ -304,6 +324,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
               </FormControl>
 
               <TextField
+                data-testid="description-field"
                 className={classes.questionField}
                 label="Descripción"
                 margin="normal"
@@ -322,6 +343,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
               />
 
               <TextField
+                data-testid="question-field"
                 className={classes.questionField}
                 label="Pregunta 1"
                 id="question_1"
@@ -393,28 +415,44 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
           )}
         </Formik>
         <Hidden lgUp>
-          <Button
-            className={classes.button}
-            variant="contained"
-            color="secondary"
-            disabled={mutationLoading}
-            onClick={() => {
-              if (scrollRef.current) {
-                scrollRef.current.scrollIntoView({ behavior: 'smooth' });
-              }
-              if (formRef.current) {
-                formRef.current.handleSubmit();
-              }
-            }}
-          >
-            Publicar oferta laboral
-            {' '}
-            {mutationLoading && <CircularProgress size={15} />}
-            {mutationError && <Cancel color="error" />}
-          </Button>
-          <Button className={classes.button} onClick={() => router.push('/recruitment-process/')} color="secondary">
-            Cancelar
-          </Button>
+          <div style={{ display: 'grid' }}>
+            <Button
+              data-testid="submit-button-small"
+              className={classes.button}
+              variant="contained"
+              color="secondary"
+              disabled={mutationLoading}
+              onClick={() => {
+                if (scrollRef.current) {
+                  scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+                }
+                if (formRef.current) {
+                  formRef.current.handleSubmit();
+                }
+              }}
+            >
+              Publicar oferta laboral
+              {' '}
+              {mutationLoading && <CircularProgress size={15} />}
+              {mutationError && <Cancel color="error" />}
+            </Button>
+            <Button className={classes.button} onClick={() => router.push('/recruitment-process/')} color="secondary">
+              Volver
+            </Button>
+            {isRecruiterChief ? (
+
+              <Button
+                style={{ color: 'red' }}
+                className={classes.button}
+                disabled={archiveLoading}
+                onClick={() => setOpenArchiveDialog(true)}
+                color="secondary"
+              >
+                Archivar
+
+              </Button>
+            ) : null}
+          </div>
         </Hidden>
 
       </Grid>
@@ -437,7 +475,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
           >
             <SamplePostedApplicationCard
               jobOffer={requestData}
-              SLA_1={SLA_1}
+              SLA_2={SLA_2}
             />
             <div className={classes.queryDetails}>
               <Typography variant="caption" component="div">
@@ -492,6 +530,7 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
           </div>
 
           <Button
+            data-testid="submit-button-large"
             className={classes.button}
             variant="contained"
             color="secondary"
@@ -511,11 +550,62 @@ export default function RequestReviewDetail(props: RequestReviewDetailProps): JS
             {mutationError && <Cancel color="error" />}
           </Button>
           <Button className={classes.button} onClick={() => router.push('/recruitment-process/')} color="secondary">
+            Volver
+          </Button>
+          {isRecruiterChief ? (
+            <Button
+              style={{ color: 'red' }}
+              className={classes.button}
+              disabled={archiveLoading}
+              onClick={() => setOpenArchiveDialog(true)}
+              color="secondary"
+            >
+              Archivar
+            </Button>
+          ) : null}
+        </Grid>
+      </Hidden>
+      <Dialog
+        open={openArchiveDialog}
+      >
+        <DialogTitle style={{ textAlign: 'center' }}>
+          ¿Está seguro?
+        </DialogTitle>
+        <DialogContent>
+          Esta acción es irreversible y esta solicitud desaparecerá para siempre
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenArchiveDialog(false)}
+            color="secondary"
+          >
             Cancelar
           </Button>
 
-        </Grid>
-      </Hidden>
+          <Button
+            style={{ color: 'red' }}
+            onClick={() => archiveJobOffer({
+              variables: {
+                archiveJobOfferJobOfferId: requestData.id,
+              },
+              refetchQueries: [
+                { query: RECRUITMENT_PROCESS_INDEX_QUERY as DocumentNode },
+              ],
+            })
+              .then(() => {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                redirectOnSubmit();
+              })
+              .catch((mutErr) => { throw (mutErr); })}
+          >
+            Archivar
+            {archiveLoading && <CircularProgress size={15} />}
+            {archiveError && <Cancel color="error" />}
+          </Button>
+
+        </DialogActions>
+
+      </Dialog>
     </Grid>
 
   );

@@ -39,6 +39,10 @@ function CustomizedSteppers(props:StepperProps) : JSX.Element {
   const classes = recruitmentProcessStepperStyles();
 
   const [activeStep, setActiveStep] = React.useState(0);
+  const [disableFinal, setDisableFinal] = React.useState(false);
+  const [disablePsy, setDisablePsy] = React.useState(false);
+  const [disableTec, setDisableTec] = React.useState(false);
+  const [disableInitial, setDisableInitial] = React.useState(false);
   const steps = getSteps();
 
   const { cols } = getCols(width);
@@ -72,6 +76,66 @@ function CustomizedSteppers(props:StepperProps) : JSX.Element {
       application.status === 'ACCEPTED'
     ));
   };
+  React.useEffect(() => {
+    const currentJobApplications = jobOfferApplications.filter(
+      (application: FilterApplicationsType) => (
+        application.status !== 'REJECTED'
+      ),
+    );
+    const acceptedApplications = currentJobApplications.filter(
+      (application: FilterApplicationsType) => (
+        application.status === 'ACCEPTED'
+      ),
+    );
+    const inProgressApplications = currentJobApplications.filter(
+      (application: FilterApplicationsType) => (
+        application.status !== 'ACCEPTED'
+      ),
+    );
+    const psychologicalApplications = inProgressApplications.filter(
+      (application: FilterApplicationsType) => (
+        application.stage === 'PSYCHOLOGICAL'
+      ),
+    );
+    const technicalApplications = inProgressApplications.filter(
+      (application: FilterApplicationsType) => (
+        application.stage === 'TECHNICAL'
+      ),
+    );
+    const preInterviewApplications = inProgressApplications.filter(
+      (application: FilterApplicationsType) => (
+        application.stage === 'PRE_INTERVIEW'
+      ),
+    );
+    if (preInterviewApplications.length === 0) {
+      setDisableInitial(true);
+    } else {
+      setDisableInitial(false);
+    }
+    if (technicalApplications.length === 0) {
+      setDisableTec(true);
+    } else {
+      setDisableTec(false);
+    }
+    if (psychologicalApplications.length === 0) {
+      setDisablePsy(true);
+    } else {
+      setDisablePsy(false);
+    }
+    if (acceptedApplications.length > 0) {
+      setDisableFinal(false);
+      return setActiveStep(3);
+    }
+    setDisableFinal(true);
+
+    if (psychologicalApplications.length > 0) {
+      return setActiveStep(2);
+    }
+    if (technicalApplications.length > 0) {
+      return setActiveStep(1);
+    }
+    return setActiveStep(0);
+  }, [jobOfferApplications]);
 
   return (
     <div className={classes.root}>
@@ -85,7 +149,11 @@ function CustomizedSteppers(props:StepperProps) : JSX.Element {
           <Step key={label}>
             <StepLabel
               style={{ cursor: 'pointer' }}
-              onClick={() => setActiveStep(index)}
+              onClick={() => (
+                [disableInitial,
+                  disableTec,
+                  disablePsy,
+                  disableFinal][index] ? {} : setActiveStep(index))}
               StepIconComponent={(properties) => <Badge badgeContent={getStepContent(index).length} color="primary">{ColorlibStepIcon(properties)}</Badge>}
             >
               <Hidden mdDown>

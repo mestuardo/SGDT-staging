@@ -1,20 +1,32 @@
 import React from 'react';
 import { Button, InputLabel } from '@material-ui/core';
-import { useMutation, DocumentNode } from '@apollo/client';
-
+import { useMutation } from '@apollo/client';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import { documentUploadStyles } from './styles';
 import { UploadDocumentType } from '../../types/upload-document-type';
 import UPLOAD_CV_MUTATION from '../../mutations/uploadDocument.graphql';
-import FILTER_APPLICATIONS from '../../queries/filter-applications.graphql';
 
 interface UploadButtonProps{
   applicationId: string,
-  jobOfferId: string,
+  handleObjURL: (obj:{ name:string, url:string }) => void
 }
-
+function Alert(props: AlertProps) {
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 export default function UploadButton(props: UploadButtonProps): JSX.Element {
-  const { applicationId, jobOfferId } = props;
+  const { applicationId, handleObjURL } = props;
   const classes = documentUploadStyles();
+  const [openAlert, setAlertOpen] = React.useState(false);
+
+  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAlertOpen(false);
+  };
 
   const [onSubmitHandler,
     { loading: mutationLoading, error: mutationError }] = useMutation<
@@ -27,19 +39,27 @@ export default function UploadButton(props: UploadButtonProps): JSX.Element {
           document: event.target.files[0],
           documentApplicationId: applicationId,
         },
-        refetchQueries: [{
-          query: FILTER_APPLICATIONS as DocumentNode,
-          variables: { jobOfferId },
-        }],
       });
+      if (!mutationLoading && !mutationError) {
+        handleObjURL({
+          name: event.target.files[0].name,
+          url: URL.createObjectURL(event.target.files[0]),
+        });
+        setAlertOpen(true);
+      }
     }
   };
 
-  if (mutationLoading) return <div>Loading...</div>;
+  if (mutationLoading) return <div>Cargando...</div>;
   if (mutationError) return <div>{JSON.stringify(mutationError, null, 2)}</div>;
 
   return (
     <div className={classes.root}>
+      <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success">
+          ¡Se ha agregó un archivo correctamente!
+        </Alert>
+      </Snackbar>
       <input
         accept=".doc,.docx,.pdf"
         className={classes.input}
@@ -50,7 +70,7 @@ export default function UploadButton(props: UploadButtonProps): JSX.Element {
       />
       <InputLabel htmlFor="contained-button-file">
         <Button variant="contained" color="primary" component="span">
-          Agregar referencias
+          Agregar archivo
         </Button>
       </InputLabel>
     </div>

@@ -1,11 +1,14 @@
 import type { KeycloakTokenParsed } from 'keycloak-js';
 
-const checkIfAllowed = (keycloakToken: KeycloakTokenParsed, userRoles: string[]): boolean => {
+export const checkIfAllowed = (
+  keycloakToken: KeycloakTokenParsed,
+  userRoles: string[],
+): boolean => {
   if (!keycloakToken || !keycloakToken.realm_access) { return false; }
   const allowedRoles = keycloakToken.realm_access.roles;
   let included = false;
   allowedRoles.forEach((role) => {
-    if (role in userRoles) {
+    if (userRoles.includes(role)) {
       included = true;
     }
   });
@@ -15,4 +18,4 @@ const checkIfAllowed = (keycloakToken: KeycloakTokenParsed, userRoles: string[])
   return false;
 };
 
-export default checkIfAllowed;
+export const userIsProfessional = (keycloakToken: KeycloakTokenParsed): boolean => (!checkIfAllowed(keycloakToken, ['recruiter', 'recruiterChief', 'internalRepresentative']));

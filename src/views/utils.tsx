@@ -31,7 +31,7 @@ export const levelOfStudiesTransformer = (value: string | undefined): string => 
   }
 };
 
-const typeOfLanguage = (value: string | undefined): string => {
+export const typeOfLanguage = (value: string | undefined): string => {
   switch (value) {
     case 'WRITING':
       return 'Escrito';
@@ -44,7 +44,7 @@ const typeOfLanguage = (value: string | undefined): string => {
   }
 };
 
-const typeOfTechnicalRequirement = (value: string | undefined): string => {
+export const typeOfTechnicalRequirement = (value: string | undefined): string => {
   switch (value) {
     case 'DESIRABLE':
       return 'Deseable';

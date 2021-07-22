@@ -1,39 +1,5 @@
-query Query($getProfessionalProfessionalId: ID!) {
-  getProfessional(professionalId: $getProfessionalProfessionalId) {
-    name
-    firstSurname
-    secondSurname
-    rut
-    specialty
-    currentJob
-    profile
-    institutions
-    technicalKnowledge
-    state
-    birthDay
-    education {
-      id
-      title
-      period
-      description
-      educationType {
-        degree
-        completed
-      }
-    }
-    skills {
-      id
-      title
-      body
-    }
-    pastJobs {
-      id
-      companyName
-      period
-      position
-      functions
-      technologiesUsed
-    }
+query Query {
+  getCurrentProfessional {
     contactInfo {
       phone
       email
@@ -45,5 +11,43 @@ query Query($getProfessionalProfessionalId: ID!) {
         number
       }
     }
+    id
+    name
+    firstSurname
+    secondSurname
+    rut
+    specialty
+    currentJob
+    savedJobOffers
+    profile
+    technicalKnowledge
+    institutions
+    education {
+      id
+      title
+      educationType {
+        degree
+        completed
+      }
+      period
+      description
+    }
+    skills {
+      id
+      title
+      body
+    }
+    pastJobs {
+      functions
+      id
+      position
+      companyName
+      period
+      technologiesUsed
+    }
+    state
+    imageUrl
+    birthDay
+    yearsExperience
   }
 }

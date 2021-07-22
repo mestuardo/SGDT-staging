@@ -9,7 +9,6 @@ import {
 import { useMutation } from '@apollo/client';
 import CREATE_APPLICATION_MUTATION from '../../mutations/createApplication.graphql';
 import { ProfessionalJobOfferDetail } from '../../types/job-offer-query-types';
-import professionalId from '../../global-variables';
 import ApplyOfferDialogInformation from './apply_offer_dialog/information';
 import ApplyOfferDialogQuestions from './apply_offer_dialog/questions';
 import ApplyOfferDialogButtons from './apply_offer_dialog/buttons';
@@ -55,7 +54,7 @@ export default function ApplyOfferDialog(props: ApplyOfferDialogProps) : JSX.Ele
       publishApplication({
         variables: {
           createApplicationInput: {
-            professionalId,
+            professionalId: localStorage.getItem('professionalId'),
             answers,
             jobOfferId: jobOffer.id,
             status: 'IN_PROCESS',

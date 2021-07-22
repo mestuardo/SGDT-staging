@@ -10,10 +10,14 @@ import {
   Grid,
   Typography,
 } from '@material-ui/core';
+import { useKeycloak } from '@react-keycloak/ssr';
+import type { KeycloakInstance } from 'keycloak-js';
+import ParsedTokenType from '../../types/keycloak-token-type';
 
 import { applicantInfoStyles } from './styles';
 import { GetProfessionalType } from '../../types/get-professional-types';
 import { FilterApplicationsType } from '../../types/filter-applications-query-types';
+import { checkIfAllowed } from '../../helpers/roles';
 
 import RejectionDialog from './rejection_dialog';
 import ApprovalDialog from './approval_dialog';
@@ -38,6 +42,10 @@ export default function NewRequestDialog(props:NewRequestDialogProps) : JSX.Elem
     step,
   } = props;
   const classes = applicantInfoStyles();
+  const { keycloak } = useKeycloak<KeycloakInstance>();
+  // The token received by keycloak with the data
+  const parsedToken = keycloak?.tokenParsed as ParsedTokenType;
+  const isRecruiter = parsedToken && checkIfAllowed(parsedToken, ['recruiter']);
 
   const [openRejectionDialog, setOpenRejectionDialog] = React.useState(false);
   const handleOpenRejectDialog = () => setOpenRejectionDialog(true);
@@ -180,19 +188,19 @@ export default function NewRequestDialog(props:NewRequestDialogProps) : JSX.Elem
         <Button onClick={handleCloseDialog} color="primary">
           Cerrar
         </Button>
-        {(applicationInfo.status === 'IN_PROCESS' && applicationInfo.stage === 'JOB_OFFER') || applicationInfo.status === 'REJECTED' ? null
+        {(applicationInfo.status === 'IN_PROCESS' && applicationInfo.stage === 'JOB_OFFER') || applicationInfo.status === 'REJECTED' || !isRecruiter ? null
           : (
             <Button onClick={handleOpenRejectDialog} style={{ color: 'red' }}>
               Rechazar
             </Button>
           )}
-        {/* {applicationInfo.status === 'REJECTED' ? null : (
+        {/* {applicationInfo.status === 'REJECTED' || isInternalRep ? null : (
           <UploadButton
             applicationId={applicationInfo.id}
             jobOfferId={applicationInfo.jobOfferId}
           />
         )} */}
-        {applicationInfo.status === 'REJECTED' || applicationInfo.status === 'ACCEPTED' ? null : (
+        {applicationInfo.status === 'REJECTED' || applicationInfo.status === 'ACCEPTED' || !isRecruiter ? null : (
           <Button onClick={handleOpenApprovalDialog} variant="contained" color="secondary">
             {(applicationInfo.status === 'IN_PROCESS' && applicationInfo.stage === 'JOB_OFFER') ? 'Convertir en candidato' : 'Pasar a siguiente fase'}
           </Button>

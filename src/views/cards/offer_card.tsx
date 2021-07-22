@@ -16,7 +16,6 @@ import UNSAVE_JOB_OFFER from '../../mutations/unsaveJobOffer.graphql';
 
 import { offerCardStyles } from './styles';
 import { ProfessionalJobOfferDetail } from '../../types/job-offer-query-types';
-import professionalId from '../../global-variables';
 
 interface JobOfferCardProps{
   jobOffer: ProfessionalJobOfferDetail,
@@ -52,7 +51,7 @@ export default function OfferCard(props:JobOfferCardProps) : JSX.Element {
   const handleSave = () => {
     saveOffer({
       variables: {
-        saveJobOfferProfessionalId: professionalId,
+        saveJobOfferProfessionalId: localStorage.getItem('professionalId'),
         saveJobOfferJobOfferId: jobOffer.id.toString(),
       },
     }).then(() => {
@@ -66,7 +65,7 @@ export default function OfferCard(props:JobOfferCardProps) : JSX.Element {
   const handleUnsave = () => {
     unsaveOffer({
       variables: {
-        unsaveJobOfferProfessionalId: professionalId,
+        unsaveJobOfferProfessionalId: localStorage.getItem('professionalId'),
         unsaveJobOfferJobOfferId: jobOffer.id.toString(),
       },
     }).then(() => {

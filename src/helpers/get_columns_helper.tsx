@@ -13,9 +13,6 @@ const getCols = (screenWidth:Breakpoint): { cols: number, gridwidth: string } =>
   if (isWidthUp('sm', screenWidth)) {
     return { cols: 2, gridwidth: '500px' };
   }
-  if (isWidthUp('xs', screenWidth)) {
-    return { cols: 1, gridwidth: '433px' };
-  }
   return { cols: 1, gridwidth: '433px' };
 };
 

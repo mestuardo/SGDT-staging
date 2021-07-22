@@ -12,6 +12,8 @@ import {
   FormControlLabel,
   FormControl,
   FormLabel,
+  Select,
+  InputLabel,
 } from '@material-ui/core';
 import { profileCardStyles } from '../styles';
 
@@ -31,7 +33,7 @@ export default function AddEducationCard(props: SkillsCardProps) : JSX.Element {
   const [period, setPeriod] = React.useState<string>('');
   const [description, setDescription] = React.useState<string>('');
   const [open, setOpen] = React.useState(true);
-  const [degree, setDegree] = React.useState('');
+  const [degree, setDegree] = React.useState('CAREER');
   const [state, setState] = React.useState('');
 
   const { addEducation, type, setAddEducation } = props;
@@ -52,7 +54,7 @@ export default function AddEducationCard(props: SkillsCardProps) : JSX.Element {
     setAddEducation(false);
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setDegree((event.target as HTMLInputElement).value);
   };
 
@@ -65,13 +67,22 @@ export default function AddEducationCard(props: SkillsCardProps) : JSX.Element {
       <DialogTitle style={{ textAlign: 'center', backgroundColor: '#19857b', color: 'white' }}>Educación</DialogTitle>
       <DialogContent>
         <FormControl component="fieldset">
-          <FormLabel component="legend">Grado</FormLabel>
-          <RadioGroup aria-label="gender" name="gender1" value={degree} onChange={handleChange}>
-            <FormControlLabel value="CAREER" control={<Radio />} label="Carrera" />
-            <FormControlLabel value="COURSE" control={<Radio />} label="Curso" />
-            <FormControlLabel value="CERTIFICATION" control={<Radio />} label="Certificación" />
-            <FormControlLabel value="POSTGRADUATE" control={<Radio />} label="Postgrado" />
-          </RadioGroup>
+          <InputLabel htmlFor="age-native-simple">Grado</InputLabel>
+          <Select
+            native
+            value={degree}
+            onChange={handleChange}
+            inputProps={{
+              name: 'Grado',
+              id: 'grade-native-simple',
+            }}
+            style={{ marginBottom: '10%' }}
+          >
+            <option value="CAREER">Carrera</option>
+            <option value="COURSE">Curso</option>
+            <option value="CERTIFICATION">Certificación</option>
+            <option value="POSTGRADUATE">Postgrado</option>
+          </Select>
         </FormControl>
         <DialogContentText>
           Titulo:
@@ -100,7 +111,7 @@ export default function AddEducationCard(props: SkillsCardProps) : JSX.Element {
           variant="filled"
         />
         <DialogContentText>
-          Descripción:
+          Institución:
         </DialogContentText>
         <TextField
           autoFocus
