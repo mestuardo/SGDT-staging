@@ -130,12 +130,7 @@ function PostedAppDetail(props:ProfilesProps) : JSX.Element {
     },
     {
       key: 'WAIT_CANDIDATES',
-      value: (
-        <>
-          <div>{new Date(jobOfferData.jobOfferCreationDate).toLocaleDateString()}</div>
-          {' '}
-          <div>Selección de candidatos</div>
-        </>),
+      value: 'Selección de candidatos',
     },
     {
       key: 'EVAL_CANDIDATES',

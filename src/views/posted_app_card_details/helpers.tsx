@@ -357,9 +357,6 @@ export const getButtons = (
           {isRecruiter
             ? (
               <>
-                <DocumentComponent
-                  currentProfessional={currentPro}
-                />
                 <UploadButton
                   applicationId={currentApp.id}
                   handleObjURL={handleObjURL}
