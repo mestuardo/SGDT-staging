@@ -81,7 +81,7 @@ export default function ClippedDrawer(props: Props): JSX.Element {
   const recruiterChiefButtonsArray = [{
     key: 'incio',
     label: 'Inicio',
-    pathname: '/login',
+    pathname: '/',
     icon: <HomeIcon />,
   },
   {
