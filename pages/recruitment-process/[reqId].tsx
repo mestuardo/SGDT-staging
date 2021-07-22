@@ -39,6 +39,7 @@ export default function Index():JSX.Element {
     error: JobOfferError,
   } = useQuery<JobOfferQueryData>(JOB_OFFER_DETAILS, {
     variables: { getJobOfferId: reqId },
+    fetchPolicy: 'network-only',
   });
   // Checks if the usser is logged in an loads the page
   if (keycloak?.authenticated || (keycloak && parsedToken)) {

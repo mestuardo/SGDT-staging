@@ -32,7 +32,7 @@ interface JobOfferDetailProps{
   jobOffer: JobOfferDetailType,
 }
 
-export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Element {
+export default function JobOfferDetails(props: JobOfferDetailProps): JSX.Element {
   // Keycloak instance, recieves parameters from the provider
   const { keycloak } = useKeycloak<KeycloakInstance>();
   // The token received by keycloak with the data
@@ -40,7 +40,7 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
   const { jobOffer } = props;
   const classes = jobOfferDetailStyles();
   const { questions } = jobOffer;
-  const redirectOnSubmit = (link:string) => { window.location.href = link; };
+  const redirectOnSubmit = (link: string) => { window.location.href = link; };
   const [closeJobOffer,
     { loading: mutationLoading, error: mutationError }] = useMutation(CLOSE_JOB_OFFER);
   const [archiveJobOffer,
@@ -64,7 +64,14 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
       throw (otherError);
     });
   };
+  const languageType = (type: string) => {
+    if (type === 'WRITING') {
+      return 'Escrito';
+    }
+    if (type === 'READING') { return 'Lectura'; }
 
+    return 'Hablado';
+  };
   return (
     <Grid
       container
@@ -138,7 +145,7 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
             {' '}
             {jobOffer.languages ? jobOffer.languages.map(
               (entry:
-              { language: string, level: string, type: string }) => `${entry.language},${entry.level},${entry.type}`,
+              { language: string, level: string, type: string }) => `${entry.language} - ${entry.level} - ${languageType(entry.type)}`,
             ).join('; ') : '-'}
           </Typography>
           <Typography variant="body1" component="div">
@@ -180,7 +187,7 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
           <Typography variant="body1" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Tipo de contrato:</Box>
             {' '}
-            {jobOffer.contractType || '-'}
+            {jobOffer.contractType.map((contract) => (contract === -1 ? 'Indefinido' : `Fijo ${contract} meses`)).join(', ') || '-'}
           </Typography>
           <Typography variant="body1" component="div">
             <Box fontWeight="fontWeightMedium" display="inline">Jornada laboral:</Box>
