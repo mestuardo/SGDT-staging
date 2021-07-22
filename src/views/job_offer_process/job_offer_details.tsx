@@ -4,6 +4,10 @@ import {
   Button,
   Box,
   Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   TextField,
   Hidden,
   Typography,
@@ -14,13 +18,15 @@ import {
 } from '@material-ui/icons';
 import { useKeycloak } from '@react-keycloak/ssr';
 import type { KeycloakInstance } from 'keycloak-js';
-import { useMutation } from '@apollo/client';
+import { DocumentNode, useMutation } from '@apollo/client';
 import { jobOfferDetailStyles } from './styles';
 import { JobOfferDetailType } from '../../types/job-offer-query-types';
 import { summaryLabels } from './helpers';
 import ParsedTokenType from '../../types/keycloak-token-type';
 import { checkIfAllowed } from '../../helpers/roles';
 import CLOSE_JOB_OFFER from '../../mutations/closeJobOffer.graphql';
+import ARCHIVE_JOB_OFFER from '../../mutations/archiveJobOffer.graphql';
+import RECRUITMENT_PROCESS_INDEX_QUERY from '../../queries/recruitment-process-index.graphql';
 
 interface JobOfferDetailProps{
   jobOffer: JobOfferDetailType,
@@ -34,15 +40,17 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
   const { jobOffer } = props;
   const classes = jobOfferDetailStyles();
   const { questions } = jobOffer;
-  const redirectOnSubmit = () => { window.location.href = '/recruitment-process?closedRequests=true'; };
+  const redirectOnSubmit = (link:string) => { window.location.href = link; };
   const [closeJobOffer,
     { loading: mutationLoading, error: mutationError }] = useMutation(CLOSE_JOB_OFFER);
+  const [archiveJobOffer,
+    { loading: archiveLoading, error: archiveError }] = useMutation(ARCHIVE_JOB_OFFER);
 
   const isRecruiterChief = parsedToken && checkIfAllowed(parsedToken, ['recruiterChief']);
   const [showCloseJobOffer, setShowCloseJobOffer] = React.useState(false);
   const [showCloseJobOfferMessage, setShowCloseJobOfferMessage] = React.useState(false);
   const [closeJobOfferMessage, setCloseJobOfferMessage] = React.useState('');
-
+  const [openArchiveDialog, setOpenArchiveDialog] = React.useState(false);
   const handleCloseJobOffer = () => {
     closeJobOffer({
       variables: {
@@ -51,7 +59,7 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
       },
     }).then(() => {
       if (mutationError) throw (mutationError);
-      redirectOnSubmit();
+      redirectOnSubmit('/recruitment-process?closedRequests=true');
     }).catch((otherError) => {
       throw (otherError);
     });
@@ -80,7 +88,7 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
         <hr />
       </Grid>
 
-      <Grid item xs={12} sm={7}>
+      <Grid item xs={12} sm={isRecruiterChief ? 7 : 12}>
         <div className={classes.detailBody}>
           {jobOffer.closeMessage ? (
             <Typography variant="body1" component="div">
@@ -211,69 +219,121 @@ export default function JobOfferDetails(props: JobOfferDetailProps) : JSX.Elemen
         </div>
 
       </Grid>
-      <Grid item xs={12} sm={5}>
-        <Hidden smUp><hr /></Hidden>
+      {isRecruiterChief ? (
+        <Grid item xs={12} sm={5}>
+          <Hidden smUp><hr /></Hidden>
 
-        <div className={classes.detailBody} style={{ textAlign: 'center' }}>
-          <Button
-            color="primary"
-            variant="outlined"
+          <div className={classes.detailBody} style={{ textAlign: 'center', display: 'grid' }}>
+            <Button
+              style={{ color: 'red' }}
+              disabled={archiveLoading}
+              onClick={() => setOpenArchiveDialog(true)}
+              color="secondary"
+            >
+              Archivar
+
+            </Button>
+            <Button
+              color="primary"
+              variant="outlined"
             // deshabilitar si user no es recruiterChief
-            disabled={(mutationLoading || (!!jobOffer.closeMessage)) || !isRecruiterChief}
-            onClick={() => setShowCloseJobOffer((o) => !o)}
+              disabled={(mutationLoading || (!!jobOffer.closeMessage)) || !isRecruiterChief}
+              onClick={() => setShowCloseJobOffer((o) => !o)}
+            >
+              Cerrar proceso
+              { mutationLoading && <CircularProgress color="primary" />}
+              {mutationError && <Cancel color="error" />}
+
+            </Button>
+            {showCloseJobOffer ? (
+              <div>
+                <Typography component="div" gutterBottom variant="caption" style={{ fontWeight: 'bold' }}>¿Tiene seguridad de que desea cerrar el proceso?</Typography>
+                <Typography component="div" variant="caption">Todos los candidatos se rechazarán automáticamente y esta acción es irreversible</Typography>
+                <Button
+                  onClick={() => setShowCloseJobOffer(false)}
+                >
+                  No
+
+                </Button>
+                <Button
+                  color="secondary"
+                  disabled={mutationLoading}
+                  onClick={() => setShowCloseJobOfferMessage((o) => !o)}
+                >
+                  Sí
+
+                </Button>
+                {showCloseJobOfferMessage ? (
+                  <>
+                    <div>
+                      <TextField
+                        multiline
+                        rows={6}
+                        variant="outlined"
+                        label="Mensaje de cierre"
+                        value={closeJobOfferMessage}
+                        onChange={(e) => setCloseJobOfferMessage(e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      onClick={handleCloseJobOffer}
+                      disabled={closeJobOfferMessage.length < 5 || mutationLoading}
+                    >
+                      Enviar
+                      { mutationLoading && <CircularProgress color="primary" size={15} />}
+                      {mutationError && <Cancel color="error" />}
+                    </Button>
+                  </>
+                ) : null}
+
+              </div>
+
+            ) : null}
+          </div>
+
+        </Grid>
+      ) : null}
+      <Dialog
+        open={openArchiveDialog}
+      >
+        <DialogTitle style={{ textAlign: 'center' }}>
+          ¿Está seguro?
+        </DialogTitle>
+        <DialogContent>
+          Esta acción es irreversible y esta solicitud desaparecerá para siempre
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenArchiveDialog(false)}
+            color="secondary"
           >
-            Cerrar proceso
-            { mutationLoading && <CircularProgress color="primary" />}
-            {mutationError && <Cancel color="error" />}
-
+            Cancelar
           </Button>
-          {showCloseJobOffer ? (
-            <div>
-              <Typography component="div" gutterBottom variant="caption" style={{ fontWeight: 'bold' }}>¿Tiene seguridad de que desea cerrar el proceso?</Typography>
-              <Typography component="div" variant="caption">Todos los candidatos se rechazarán automáticamente y esta acción es irreversible</Typography>
-              <Button
-                onClick={() => setShowCloseJobOffer(false)}
-              >
-                No
 
-              </Button>
-              <Button
-                color="secondary"
-                disabled={mutationLoading}
-                onClick={() => setShowCloseJobOfferMessage((o) => !o)}
-              >
-                Sí
+          <Button
+            style={{ color: 'red' }}
+            onClick={() => archiveJobOffer({
+              variables: {
+                archiveJobOfferJobOfferId: jobOffer.id,
+              },
+              refetchQueries: [
+                { query: RECRUITMENT_PROCESS_INDEX_QUERY as DocumentNode },
+              ],
+            })
+              .then(() => {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                redirectOnSubmit('/recruitment-process?postedRequests=false');
+              })
+              .catch((mutErr) => { throw (mutErr); })}
+          >
+            Archivar
+            {archiveLoading && <CircularProgress size={15} />}
+            {archiveError && <Cancel color="error" />}
+          </Button>
 
-              </Button>
-              {showCloseJobOfferMessage ? (
-                <>
-                  <div>
-                    <TextField
-                      multiline
-                      rows={6}
-                      variant="outlined"
-                      label="Mensaje de cierre"
-                      value={closeJobOfferMessage}
-                      onChange={(e) => setCloseJobOfferMessage(e.target.value)}
-                    />
-                  </div>
-                  <Button
-                    onClick={handleCloseJobOffer}
-                    disabled={closeJobOfferMessage.length < 5 || mutationLoading}
-                  >
-                    Enviar
-                    { mutationLoading && <CircularProgress color="primary" size={15} />}
-                    {mutationError && <Cancel color="error" />}
-                  </Button>
-                </>
-              ) : null}
+        </DialogActions>
 
-            </div>
-
-          ) : null}
-        </div>
-
-      </Grid>
+      </Dialog>
     </Grid>
 
   );

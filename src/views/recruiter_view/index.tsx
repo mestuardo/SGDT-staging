@@ -207,6 +207,10 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
       filterJobOfferRecent();
       setAlertMessage('Se ha creado una solicitud satisfactoriamente');
       setAlertOpen(true);
+    } else if (postedRequests === 'false') {
+      setValue(2);
+      setAlertMessage('Se ha archivado una oferta laboral satisfactoriamente');
+      setAlertOpen(true);
     }
   },
   [data.jobOffers]);
@@ -380,7 +384,7 @@ function RecruiterView(props:RecruiterViewProps) : JSX.Element {
             onChange={handleTabChange}
             aria-label="Horizontal tabs"
           >
-            {isRecruiter ? <Tab label="Inicio" id={assignIdToTab(0).id} aria-controls={assignIdToTab(0)['aria-controls']} /> : null}
+            {isRecruiter ? <Tab label="Resumen" id={assignIdToTab(0).id} aria-controls={assignIdToTab(0)['aria-controls']} /> : null}
             {isRecruiter ? <Tab label="Solicitudes pendientes" id={assignIdToTab(1).id} aria-controls={assignIdToTab(1)['aria-controls']} /> : null}
             <Tab label="Solicitudes publicadas" id={assignIdToTab(2).id} aria-controls={assignIdToTab(2)['aria-controls']} />
             {isRecruiter ? <Tab label="Solicitudes cerradas" id={assignIdToTab(3).id} aria-controls={assignIdToTab(3)['aria-controls']} /> : null}
