@@ -34,19 +34,19 @@ export default function UploadButton(props: UploadButtonProps): JSX.Element {
 
   const newHandleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length === 1) {
-      await onSubmitHandler({
-        variables: {
-          document: event.target.files[0],
-          documentApplicationId: applicationId,
-        },
-      });
-      if (!mutationLoading && !mutationError) {
+      // await onSubmitHandler({
+      //   variables: {
+      //     document: event.target.files[0],
+      //     documentApplicationId: applicationId,
+      //   },
+      // });
+      // if (!mutationLoading && !mutationError) {
         handleObjURL({
           name: event.target.files[0].name,
           url: URL.createObjectURL(event.target.files[0]),
         });
         setAlertOpen(true);
-      }
+      // }
     }
   };
 
